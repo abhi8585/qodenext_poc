@@ -1,0 +1,208 @@
+issue_description,model
+Battery drain,TC21
+Software freezes or crashes,TC21
+Connectivity problem,TC21
+Scanning issue – Scan engine not responding,TC21
+Touchscreen sensitivity,TC21
+Overheating,TC21
+Device lag or slowdown,TC21
+Camera issues,TC21
+Operating system (OS) compatibility,TC21
+Physical damage,TC21
+GPS or location accuracy,TC21
+Battery drain,TC26
+Software freezes or crashes,TC26
+Connectivity problem,TC26
+Scanning issue – Scan engine not responding,TC26
+Touchscreen sensitivity,TC26
+Overheating,TC26
+Device lag or slowdown,TC26
+Camera issues,TC26
+Operating system (OS) compatibility,TC26
+Physical damage,TC26
+GPS or location accuracy,TC26
+Battery drain,RS35
+Software freezes or crashes,RS35
+Connectivity problem,RS35
+Scanning issue – Scan engine not responding,RS35
+Touchscreen sensitivity,RS35
+Overheating,RS35
+Device lag or slowdown,RS35
+Camera issues,RS35
+Operating system (OS) compatibility,RS35
+Physical damage,RS35
+GPS or location accuracy,RS35
+Battery drain,RS51
+Software freezes or crashes,RS51
+Connectivity problem,RS51
+Scanning issue – Scan engine not responding,RS51
+Touchscreen sensitivity,RS51
+Overheating,RS51
+Device lag or slowdown,RS51
+Camera issues,RS51
+Operating system (OS) compatibility,RS51
+Physical damage,RS51
+GPS or location accuracy,RS51
+Battery drain,RS50
+Software freezes or crashes,RS50
+Connectivity problem,RS50
+Scanning issue – Scan engine not responding,RS50
+Touchscreen sensitivity,RS50
+Overheating,RS50
+Device lag or slowdown,RS50
+Camera issues,RS50
+Operating system (OS) compatibility,RS50
+Physical damage,RS50
+GPS or location accuracy,RS50
+Battery drain,MC3200
+Software freezes or crashes,MC3200
+Connectivity problem,MC3200
+Scanning issue – Scan engine not responding,MC3200
+Touchscreen sensitivity,MC3200
+Overheating,MC3200
+Device lag or slowdown,MC3200
+Camera issues,MC3200
+Operating system (OS) compatibility,MC3200
+Physical damage,MC3200
+GPS or location accuracy,MC3200
+Memory or storage issues,MC3200
+Button or keypad problems,MC3200
+Configuration and setup challenges,MC3200
+Print quality issues,ZD230
+Paper jams,ZD230
+Connectivity problems,ZD230
+Battery and power issues,ZD230
+Calibration issues,ZD230
+Sensor errors,ZD230
+Label formatting issues,ZD230
+Error messages,ZD230
+Ribbon issues,ZD230
+Software compatibility,ZD230
+Firmware updates,ZD230
+Mechanical malfunctions,ZD230
+Print quality issues,ZD420
+Paper jams,ZD420
+Connectivity problems,ZD420
+Battery and power issues,ZD420
+Calibration issues,ZD420
+Sensor errors,ZD420
+Label formatting issues,ZD420
+Error messages,ZD420
+Ribbon issues,ZD420
+Software compatibility,ZD420
+Firmware updates,ZD420
+Mechanical malfunctions,ZD420
+Print quality issues,ZD620
+Paper jams,ZD620
+Connectivity problems,ZD620
+Battery and power issues,ZD620
+Calibration issues,ZD620
+Sensor errors,ZD620
+Label formatting issues,ZD620
+Error messages,ZD620
+Ribbon issues,ZD620
+Software compatibility,ZD620
+Firmware updates,ZD620
+Mechanical malfunctions,ZD620
+Print quality issues,ZT410
+Paper jams,ZT410
+Connectivity problems,ZT410
+Battery and power issues,ZT410
+Calibration issues,ZT410
+Sensor errors,ZT410
+Label formatting issues,ZT410
+Error messages,ZT410
+Ribbon issues,ZT410
+Software compatibility,ZT410
+Firmware updates,ZT410
+Mechanical malfunctions,ZT410
+Print quality issues,ZT411
+Paper jams,ZT411
+Connectivity problems,ZT411
+Battery and power issues,ZT411
+Calibration issues,ZT411
+Sensor errors,ZT411
+Label formatting issues,ZT411
+Error messages,ZT411
+Ribbon issues,ZT411
+Software compatibility,ZT411
+Firmware updates,ZT411
+Mechanical malfunctions,ZT411
+Print quality issues,ZT510
+Paper jams,ZT510
+Connectivity problems,ZT510
+Battery and power issues,ZT510
+Calibration issues,ZT510
+Sensor errors,ZT510
+Label formatting issues,ZT510
+Error messages,ZT510
+Ribbon issues,ZT510
+Software compatibility,ZT510
+Firmware updates,ZT510
+Mechanical malfunctions,ZT510
+Print quality issues,GT800
+Paper jams,GT800
+Connectivity problems,GT800
+Battery and power issues,GT800
+Calibration issues,GT800
+Sensor errors,GT800
+Label formatting issues,GT800
+Error messages,GT800
+Ribbon issues,GT800
+Software compatibility,GT800
+Firmware updates,GT800
+Mechanical malfunctions,GT800
+Print quality issues,Z120
+Paper jams,Z120
+Connectivity problems,Z120
+Battery and power issues,Z120
+Calibration issues,Z120
+Sensor errors,Z120
+Label formatting issues,Z120
+Error messages,Z120
+Ribbon issues,Z120
+Software compatibility,Z120
+Firmware updates,Z120
+Mechanical malfunctions,Z120
+Print quality issues,ZQ520
+Paper jams,ZQ520
+Connectivity problems,ZQ520
+Battery and power issues,ZQ520
+Calibration issues,ZQ520
+Sensor errors,ZQ520
+Label formatting issues,ZQ520
+Error messages,ZQ520
+Ribbon issues,ZQ520
+Software compatibility,ZQ520
+Firmware updates,ZQ520
+Mechanical malfunctions,ZQ520
+Connection issues,DS3678
+Barcode scanning problems,DS3678
+Battery and power issues,DS3678
+Firmware compatibility,DS3678
+Scan engine failure,DS3678
+Bluetooth interference,DS3678
+Physical damage,DS3678
+Configuration issues,DS3678
+Software compatibility,DS3678
+Configuration and setup challenges,DS3678
+Connection issues,DS9200
+Barcode scanning problems,DS9200
+Battery and power issues,DS9200
+Firmware compatibility,DS9200
+Scan engine failure,DS9200
+Bluetooth interference,DS9200
+Physical damage,DS9200
+Configuration issues,DS9200
+Software compatibility,DS9200
+Configuration and setup challenges,DS9200
+Connection issues,LI4278
+Barcode scanning problems,LI4278
+Battery and power issues,LI4278
+Firmware compatibility,LI4278
+Scan engine failure,LI4278
+Bluetooth interference,LI4278
+Physical damage,LI4278
+Configuration issues,LI4278
+Software compatibility,LI4278
+Configuration and setup challenges,LI4278
