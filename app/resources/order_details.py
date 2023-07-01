@@ -13,13 +13,48 @@ mysql_client = MySQLClient(mysql_uri)
 
 class OrderDetailsResource(Resource):
 
+
+    def get_keg_name(self, key):
+        if key == "bud_30":
+            return dict(keg_name = "Budweiser Premium Beer", keg_quantity = 30)
+        if key == "mag_30":
+            return dict(keg_name = "Bud Magnum Beer", keg_quantity = 30)
+        if key == "hog_15":
+            return dict(keg_name = "Hoegaarden Witbier", keg_quantity = 15)
+    
+
+    def delete_key(self,dictionary, key):
+        if key in dictionary:
+            del dictionary[key]
+        return dictionary
+        
+
     def get_order_details(self, order_id):
         try:
             if order_id:
                 columns = ['area','bud_30','draught_code','hog_15','license_billing_name','mag_30','order_detail_id','order_id','outlets_name']
                 order_details_data = mysql_client.select(table_name='order_details',columns=columns,filter_condition=f"where order_id = {order_id}")
                 if order_details_data:
-                    return order_details_data['results']
+                    order_detail_results = order_details_data['results']
+                    for order_detail in order_detail_results:
+                        order_detail["keg_data"] = []
+                        for key, value in order_detail.items():
+                            if key == "bud_30":
+                                keg_obj = self.get_keg_name(key)
+                                keg_obj['keg_count'] = value
+                                keg_obj["keg_code"] = "bud_30"
+                                order_detail["keg_data"].append(keg_obj)
+                            if key == "mag_30":
+                                keg_obj = self.get_keg_name(key)
+                                keg_obj['keg_count'] = value
+                                keg_obj["keg_code"] = "mag_30"
+                                order_detail["keg_data"].append(keg_obj)
+                            if key == "hog_15":
+                                keg_obj = self.get_keg_name(key)
+                                keg_obj['keg_count'] = value
+                                keg_obj["keg_code"] = "hog_15"
+                                order_detail["keg_data"].append(keg_obj)
+                    return order_details_data
         except Exception as e:
             logger.log_error(f"Error while getting order details, Error : {e}")
 
@@ -64,8 +99,8 @@ class OrderDetailsResource(Resource):
                 if order_header_data:
                     if len(order_header_data['results']) > 0:
                         print('got order header data')
-                        order_id = order_header_data['results'][0]['order_id']
-                        # order_id = 7
+                        # order_id = order_header_data['results'][0]['order_id']
+                        order_id = 7
                         order_details = self.get_order_details(order_id=order_id)
                         if order_details:
                             keg_count = self.get_keg_count(order_id=order_id)
