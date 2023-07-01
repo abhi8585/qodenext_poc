@@ -113,7 +113,7 @@ class OrderDetailsResource(Resource):
                             return {'status':200,'data': []}
                     else:
                         logger.log_info(f"No data for given order date")
-                        return {'status':200,'data': {}}
+                        return {'status':200,'data': None}
                 else:
                     logger.log_info(f"Error while getting orded  details")
                     return {'status':200,'data': []}
