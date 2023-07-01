@@ -99,8 +99,8 @@ class OrderDetailsResource(Resource):
                 if order_header_data:
                     if len(order_header_data['results']) > 0:
                         print('got order header data')
-                        # order_id = order_header_data['results'][0]['order_id']
-                        order_id = 7
+                        order_id = order_header_data['results'][0]['order_id']
+                        # order_id = 7
                         order_details = self.get_order_details(order_id=order_id)
                         if order_details:
                             keg_count = self.get_keg_count(order_id=order_id)
