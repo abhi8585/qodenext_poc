@@ -36,6 +36,7 @@ class MySQLClient:
                 logger.log_error(error_message)
         return db
 
+
     def select(self, table_name, columns=None, filter_condition=None):
         logger.log_info(f"Executing select statement for table : {table_name} and columns {columns}")
         select_status = None
@@ -52,8 +53,6 @@ class MySQLClient:
                 logger.log_info(f"Executing select sql query : {query}")
                 self.cursor.execute(query)
                 rows = self.cursor.fetchall()
-                self.cursor.close()
-                self.db.close()
                 results = [dict(zip(self.cursor.column_names, row)) for row in rows]
                 select_status = dict(status="success",results=results)
                 logger.log_info(f"Select Execution Completed!")
@@ -61,8 +60,11 @@ class MySQLClient:
                 error_message = f"Please make the connection first"
                 logger.log_error(error_message)
         except Exception as e:
+            logger.log_error(f"{e}")
             logger.log_error(f"Error while executing select statement")
         return select_status
+
+
 
     def update(self, table, column_values, filter_condition=None):
         logger.log_info(f"Executing update statement for table : {table},columns {column_values},filter_condition : {filter_condition}")
@@ -77,7 +79,6 @@ class MySQLClient:
             self.cursor.execute(query, values)
             self.db.commit()
             affected_rows = self.cursor.rowcount
-            self.cursor.close()
             update_status = dict(status="success",affected_rows=affected_rows)
             logger.log_info(f"Update Execution Completed!")
         except Exception as e:
@@ -97,8 +98,9 @@ class MySQLClient:
             logger.log_info(f"Executing insert sql query : {query}")
             self.cursor.execute(query, data)
             self.db.commit()
+            last_row_id = self.cursor.lastrowid
             logger.log_info(f"Insert Execution Completed!")
-            insert_status = dict(status="success",affected_rows = self.cursor.rowcount)
+            insert_status = dict(status="success",affected_rows = self.cursor.rowcount,last_row_id=last_row_id)
         except Exception as e:
             error_message = f"Error : {e} while inserting in {table_name}, filter_condition : {filter_condition},columns_values : {column_values}"
             logger.log_error(error_message)
@@ -110,12 +112,11 @@ class MySQLClient:
         try:
             query = f"DELETE FROM {table}"
             if filter_condition:
-                query += f" WHERE {filter_condition}"
+                query += f" {filter_condition}"
             logger.log_info(f"Executing delete sql query : {query}")
             self.cursor.execute(query)
             self.db.commit()
             affected_rows = self.cursor.rowcount
-            self.cursor.close()
             delete_status = dict(status="success",affected_rows=affected_rows)
             logger.log_info(f"Delete Execution Completed!")
             return delete_status
@@ -134,11 +135,20 @@ class MySQLClient:
                 """
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
-        self.cursor.close()
-        self.db.close()
         results = [dict(zip(self.cursor.column_names, row)) for row in rows]
         select_status = dict(status="success",results=results)
         return select_status
+
+    def execute_query(self, query):
+        query_results = None
+        try:
+            self.cursor.execute(query)
+            rows = self.cursor.fetchall()
+            results = [dict(zip(self.cursor.column_names, row)) for row in rows]
+            query_results = dict(status="success",results=results)
+        except Exception as e:
+            logger.log_error(f"Error while executing direct query, Error : {e}")
+        return query_results
 
 
 
