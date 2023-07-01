@@ -45,6 +45,8 @@ class LoginResource(Resource):
             if len(user['results']) > 0:
                 role_name = None
                 user_id = user['results'][0]['user_id']
+                user_name = user['results'][0]['user_name']
+                print(user_name)
                 role_id = mysql_client.select(table_name='user_to_role',filter_condition=f"where user_id = {user_id}")
                 if role_id:
                     if len(role_id['results']) > 0:
@@ -64,7 +66,7 @@ class LoginResource(Resource):
                     auth_token = self.generate_auth_token(email)
                     mysql_client.insert(table_name='access_token', column_values={'access_token' :auth_token})
                     logger.log_info(f"User login successfully!")
-                    return {'status':200,'message': 'Login successfull.','access_token':auth_token, 'role_name':role_name}, 200
+                    return {"user_name":user_name,"user_id":user_id,'status':200,'message': 'Login successfull.','access_token':auth_token, 'role_name':role_name}, 200
                 else:
                     logger.log_info(f"Invalid password!")
                     return {'message': 'Invalid password.'}, 401

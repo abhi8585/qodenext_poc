@@ -15,7 +15,7 @@ uuid_client = UUIDClient()
 class MapUuidToOrderResource(Resource):
 
     def get(self):
-        mapped_status = []
+        mapped_status = dict(status=500,data="")
         try:
             order_id = request.args.get('order_id')
             if not order_id:
@@ -24,7 +24,10 @@ class MapUuidToOrderResource(Resource):
             order_uuid = request.args.get('order_uuid')
             if not order_uuid:
                 return {'status' : 200, 'message' : 'No order_uuid given', 'data' : []}
-            
+
+            user_id = request.args.get('user_id')
+            # if not user_id:
+            #     return {'status' : 200, 'message' : 'No user_id given', 'data' : []}
             order_product = request.args.get('order_product')
             if not order_product:
                 return {'status' : 200, 'message' : 'No order_product given', 'data' : []}

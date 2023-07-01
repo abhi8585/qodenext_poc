@@ -26,14 +26,30 @@ class OrderDetailsResource(Resource):
 
     def get_keg_count(self, order_id):
         keg_count = None
+        order_details = []
         try:
             query = f"""SELECT sum(bud_30) as bud_30 ,sum(mag_30) as mag_30, sum(hog_15) as hog_15
              FROM order_details where order_id = {order_id}"""
             keg_count = mysql_client.execute_query(query=query)
+            print(f"count")
+            print(keg_count)
             if keg_count:
                 keg_count = keg_count['results'][0]
                 integer_dict = {key: int(value) for key, value in keg_count.items()}
-            return integer_dict
+            for key, value in integer_dict.items():
+                keg_name, keg_quantity = "", ""
+                if key == "bud_30":
+                    keg_name = "Budweiser Premium Beer"
+                    keg_quantity = 30
+                if key == "mag_30":
+                    keg_name = "Bud Magnum Beer"
+                    keg_quantity = 30
+                if key == "hog_15":
+                    keg_name = "Hoegaarden Witbier"
+                    keg_quantity = 15
+                order_obj = dict(keg_name=keg_name,keg_quantity=keg_quantity,keg_count=value,keg_code=key)
+                order_details.append(order_obj)                    
+            return order_details
         except Exception as e:
             logger.log_error(f"Error while getting kegs count for order_id , {order_id}, Error : {e}")
         return keg_count
@@ -49,6 +65,7 @@ class OrderDetailsResource(Resource):
                     if len(order_header_data['results']) > 0:
                         print('got order header data')
                         order_id = order_header_data['results'][0]['order_id']
+                        order_id = 7
                         order_details = self.get_order_details(order_id=order_id)
                         if order_details:
                             keg_count = self.get_keg_count(order_id=order_id)
