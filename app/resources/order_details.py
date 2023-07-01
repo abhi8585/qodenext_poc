@@ -100,7 +100,7 @@ class OrderDetailsResource(Resource):
                     if len(order_header_data['results']) > 0:
                         print('got order header data')
                         order_id = order_header_data['results'][0]['order_id']
-                        # order_id = 7
+                        order_id = 7
                         order_details = self.get_order_details(order_id=order_id)
                         if order_details:
                             keg_count = self.get_keg_count(order_id=order_id)
@@ -112,10 +112,10 @@ class OrderDetailsResource(Resource):
                             logger.log_info(f"Error while getting order details with order_id {order_id}")
                             return {'status':200,'data': []}
                     else:
-                        logger.log_info(f"Error while getting orded header details")
-                        return {'status':200,'data': []}
+                        logger.log_info(f"No data for given order date")
+                        return {'status':200,'data': {}}
                 else:
-                    logger.log_info(f"Getting data from order header failed")
+                    logger.log_info(f"Error while getting orded  details")
                     return {'status':200,'data': []}
             except Exception as e:
                 logger.log_info(f"Error while getting order data for date, {order_date}, Error :  {e}")
