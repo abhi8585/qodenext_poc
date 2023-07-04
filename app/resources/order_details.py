@@ -95,7 +95,6 @@ class OrderDetailsResource(Resource):
         if order_date:
             try:
                 order_header_data = mysql_client.select(table_name='order_header',filter_condition=f"where order_date = '{order_date}' limit 1;")
-                print(order_header_data)
                 if order_header_data:
                     if len(order_header_data['results']) > 0:
                         print('got order header data')
@@ -113,7 +112,7 @@ class OrderDetailsResource(Resource):
                             return {'status':200,'data': []}
                     else:
                         logger.log_info(f"No data for given order date")
-                        return {'status':200,'data': None}
+                        return {'status':200,'data': []}
                 else:
                     logger.log_info(f"Error while getting orded  details")
                     return {'status':200,'data': []}
