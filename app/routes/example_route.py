@@ -16,10 +16,10 @@ from app.resources.access_management.login import LoginResource
 from app.resources.access_management.logout import LogoutResource
 from app.resources.access_management.map_role_to_permission import MapRoleToPermissionResource
 from app.resources.access_management.map_user_to_role import MapUserToRoleResource
-# from app.resources.map_uuid_to_customer import MapUuidToCustomerResource
+from app.resources.map_uuid_to_customer import MapUuidToCustomerResource
 
 from app.resources.get_customer_list import GetCustomersList
-# from app.resources.map_uuid_to_pickup import MapUuidToPickupResource
+from app.resources.map_uuid_to_pickup import MapUuidToPickupResource
 
 from app.resources.uuid_resource import UUIDValidationResource
 
@@ -41,7 +41,7 @@ process_order_resource = ProcessOrderResource
 order_details_resource = OrderDetailsResource
 uuid_resource = UUIDResource
 map_uuid_resource = MapUuidToOrderResource
-# map_uuid_customer_resource = MapUuidToCustomerResource
+map_uuid_customer_resource = MapUuidToCustomerResource
 user_resource = UserResource.as_view('user_resource')
 role_resource = RoleResource.as_view('role_resource')
 permission_resource = PermissionResource.as_view('permission_resource')
@@ -49,8 +49,8 @@ login_resource = LoginResource.as_view('login_resource')
 logout_resource = LogoutResource.as_view('logout_resource')
 map_role_to_permission_resource = MapRoleToPermissionResource.as_view('map_role_to_permission')
 map_role_to_user_resource = MapUserToRoleResource.as_view('map_user_to_permission')
-# get_customer_list_resource = GetCustomersList.as_view('get_customers_list')
-# map_uuid_to_pickup_resouce = MapUuidToPickupResource.as_view('map_uuid_to_pickup_resouce')
+get_customer_list_resource = GetCustomersList.as_view('get_customers_list')
+map_uuid_to_pickup_resouce = MapUuidToPickupResource.as_view('map_uuid_to_pickup_resouce')
 uuid_validation_resource = UUIDValidationResource.as_view('uuid_validation_resource')
 
 
@@ -108,13 +108,13 @@ example_route.add_url_rule('/mrp', view_func=map_role_to_permission_resource)
 example_route.add_url_rule('/mur', view_func=map_role_to_user_resource)
 
 # Map uuid to customer
-# example_route.add_url_rule('/mcuuid', view_func=map_uuid_customer_resource.as_view('mcuuid'))
+example_route.add_url_rule('/mcuuid', view_func=map_uuid_customer_resource.as_view('mcuuid'))
 
 # Get Customer List
-# example_route.add_url_rule('/gcust', view_func=get_customer_list_resource)
+example_route.add_url_rule('/gcust', view_func=get_customer_list_resource)
 
 # Map uuid to Pickup 
-# example_route.add_url_rule('/mpuuid', view_func=map_uuid_to_pickup_resouce)
+example_route.add_url_rule('/mpuuid', view_func=map_uuid_to_pickup_resouce)
 
 # check if the valid uuid is scanned
 example_route.add_url_rule('/vuuid', view_func=uuid_validation_resource)

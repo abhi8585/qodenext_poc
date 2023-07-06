@@ -26,15 +26,15 @@ class MapUuidToOrderResource(Resource):
                 return {'status' : 200, 'message' : 'No order_uuid given', 'data' : []}
 
             user_id = request.args.get('user_id')
-            # if not user_id:
-            #     return {'status' : 200, 'message' : 'No user_id given', 'data' : []}
+            if not user_id:
+                return {'status' : 200, 'message' : 'No user_id given', 'data' : []}
             order_product = request.args.get('order_product')
             if not order_product:
                 return {'status' : 200, 'message' : 'No order_product given', 'data' : []}
             order_uuid_id = mysql_client.select(table_name='uuid',filter_condition=f"where uuid = '{order_uuid}'")
             if order_uuid_id:
                 uuid_id = order_uuid_id['results'][0]['id']
-                row_obj = dict(order_id=order_id, uuid_id=uuid_id, product_name = order_product)
+                row_obj = dict(order_id=order_id, uuid_id=uuid_id, product_name = order_product,status="dispatched")
                 insert_mapped_status = mysql_client.insert(table_name='keg_mapping',column_values=row_obj)
                 if insert_mapped_status:
                     mapped_status = dict(status=200,data=insert_mapped_status)
