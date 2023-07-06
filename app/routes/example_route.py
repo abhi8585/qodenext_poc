@@ -49,7 +49,7 @@ login_resource = LoginResource.as_view('login_resource')
 logout_resource = LogoutResource.as_view('logout_resource')
 map_role_to_permission_resource = MapRoleToPermissionResource.as_view('map_role_to_permission')
 map_role_to_user_resource = MapUserToRoleResource.as_view('map_user_to_permission')
-get_customer_list_resource = GetCustomersList.as_view('get_customers_list')
+# get_customer_list_resource = GetCustomersList.as_view('get_customers_list')
 # map_uuid_to_pickup_resouce = MapUuidToPickupResource.as_view('map_uuid_to_pickup_resouce')
 uuid_validation_resource = UUIDValidationResource.as_view('uuid_validation_resource')
 
@@ -111,7 +111,7 @@ example_route.add_url_rule('/mur', view_func=map_role_to_user_resource)
 # example_route.add_url_rule('/mcuuid', view_func=map_uuid_customer_resource.as_view('mcuuid'))
 
 # Get Customer List
-example_route.add_url_rule('/gcust', view_func=get_customer_list_resource)
+# example_route.add_url_rule('/gcust', view_func=get_customer_list_resource)
 
 # Map uuid to Pickup 
 # example_route.add_url_rule('/mpuuid', view_func=map_uuid_to_pickup_resouce)
