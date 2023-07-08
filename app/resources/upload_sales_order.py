@@ -21,10 +21,23 @@ class UploadSalesOrderResource(Resource):
     def get(self):
         return {'message' : 'from get request'}
 
+
+    def create_local_folder(self,folder_name):
+        # Get the current working directory
+        is_created = None
+        try:
+            current_dir = os.getcwd()
+            is_created = os.path.join(current_dir, folder_name)
+            os.makedirs(is_created)
+        except Exception as e:
+            self.logger.log_error(f"HELPER-Error while creating local folder : {e}")
+        return is_created
+
     def save_file(self, order_file):
         is_saved = None
         try:
-            saved_dir = 'uploaded_orders/'
+            saved_dir = self.create_local_folder('uploaded_orders')
+            # saved_dir = 'uploaded_orders/'
             file_path = os.path.join(saved_dir, order_file.filename)
             order_file.save(file_path)
             is_saved = file_path
@@ -57,7 +70,7 @@ class UploadSalesOrderResource(Resource):
         return is_uploaded
 
     
-    def create_folder(self, folder_name):
+    def create_s3_folder(self, folder_name):
         is_created = None
         try:
             s3_client = self.create_s3_client()
@@ -84,23 +97,24 @@ class UploadSalesOrderResource(Resource):
             if not order_file:
                 return {'status' : 200, 'message' : 'No order file given'}
             is_file_saved = self.save_file(order_file)
-            is_folder_created = self.create_folder(self.get_today_date())
-            s3_file_name = is_folder_created + is_file_saved.split('/')[1]
-            if is_file_saved:
-                is_uploaded = self.upload_file(is_file_saved,s3_file_name)
-                if is_uploaded:
-                    is_order_stored = self.process_client.save_order(is_file_saved)
-                    if is_order_stored['status']:
-                        ret_obj['status'] = 200
-                        ret_obj['message'] = f"Order created successfully for {is_file_saved}"
-                        ret_obj['order_id'] = is_order_stored['order_id']
-                    else:
-                        self.logger.log_error(f"MAIN-Error while storing data in DB for {order_file}")
-                else:
-                    self.logger.log_error(f"MAIN-Error while uploading order file to S3 : {order_file}")
-            else:
-                self.logger.log_error(f"MAIN-Error while saving order file : {order_file}")
-            return ret_obj, 201
+
+            # is_folder_created = self.create_s3_folder(self.get_today_date())
+            # s3_file_name = is_folder_created + is_file_saved.split('/')[1]
+            # if is_file_saved:
+            #     is_uploaded = self.upload_file(is_file_saved,s3_file_name)
+            #     if is_uploaded:
+            #         is_order_stored = self.process_client.save_order(is_file_saved)
+            #         if is_order_stored['status']:
+            #             ret_obj['status'] = 200
+            #             ret_obj['message'] = f"Order created successfully for {is_file_saved}"
+            #             ret_obj['order_id'] = is_order_stored['order_id']
+            #         else:
+            #             self.logger.log_error(f"MAIN-Error while storing data in DB for {order_file}")
+            #     else:
+            #         self.logger.log_error(f"MAIN-Error while uploading order file to S3 : {order_file}")
+            # else:
+            #     self.logger.log_error(f"MAIN-Error while saving order file : {order_file}")
+            # return ret_obj, 201
         except Exception as e:
             self.logger.log_error(f"MAIN-Error while uploading Sales order : {e}")
             return ret_obj, 500
