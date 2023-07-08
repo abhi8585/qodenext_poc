@@ -1,6 +1,8 @@
 from enum import Enum
 class VerboseLevels(Enum):
-    ERROR = 1
+    ERROR = 3
     WARNING = 2
-    INFO = 3
+    INFO = 1
     DEBUG = 4
+    DEV = 'dev'
+    PROD = 'prod'

@@ -22,7 +22,7 @@ from app.resources.get_customer_list import GetCustomersList
 from app.resources.map_uuid_to_pickup import MapUuidToPickupResource
 
 from app.resources.uuid_resource import UUIDValidationResource
-
+from app.resources.upload_sales_order import UploadSalesOrderResource
 
 
 
@@ -52,6 +52,7 @@ map_role_to_user_resource = MapUserToRoleResource.as_view('map_user_to_permissio
 get_customer_list_resource = GetCustomersList.as_view('get_customers_list')
 map_uuid_to_pickup_resouce = MapUuidToPickupResource.as_view('map_uuid_to_pickup_resouce')
 uuid_validation_resource = UUIDValidationResource.as_view('uuid_validation_resource')
+upload_sales_order_resource = UploadSalesOrderResource.as_view('upload_sales_order_resource')
 
 
 
@@ -65,6 +66,7 @@ example_route.add_url_rule('/process-order', view_func=process_order_resource.as
 example_route.add_url_rule('/sodetail', view_func=order_details_resource.as_view('sodetail'))
 example_route.add_url_rule('/guuid', view_func=uuid_resource.as_view('guuid'))
 example_route.add_url_rule('/muuid', view_func=map_uuid_resource.as_view('muuid'))
+example_route.add_url_rule('/usorder', view_func=upload_sales_order_resource)
 
 # example_route.add_url_rule('/muuid', view_func=map_uuid_resource.as_view('muuid'))
 

@@ -70,10 +70,9 @@ class ProcessOrderResource(Resource):
         return process_status
 
 
-    def get(self):
-        ret_obj = dict()
+    def save_order(self, file_path):
+        ret_obj = dict(status=None,order_id=None)
         try:
-            file_path = "/Users/abhisheksharma/code/web/srctrac_backend/app/utils/xlsx/keg-order.xlsx"
             sheet_name = 'Unix'
             config = ConfigClient(env='dev')
             mysql_uri = config.get_value("Database", "uri")
@@ -98,8 +97,6 @@ class ProcessOrderResource(Resource):
                 ret_obj["status"] = 200
                 ret_obj["order_id"] = ""
         except Exception as e:
-            ret_obj["status"] = 500
-            ret_obj["order_id"] = ""
             logger.log_error(f"Error in Process order get request")
         return ret_obj
 
