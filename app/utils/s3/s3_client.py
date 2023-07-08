@@ -24,7 +24,7 @@ class S3Client:
             )
             logger.log_info(f"S3 client created successfully!")
         except Exception as e:
-            logger.log_error(f"Errow while creating S3 client")
+            logger.log_error(f"Errow while creating S3 client {e}")
         return client
 
     def upload_file(self, file_path, s3_file_name):
@@ -33,7 +33,7 @@ class S3Client:
             upload_file = self.client.upload_file(file_path, self.bucket_name, s3_file_name)
             is_uploaded = True
         except Exception as e:
-            logger.log_error(f"Error whiel uploading file to S3 : {file_path}")
+            logger.log_error(f"Error while uploading file to S3 : {file_path} : {e}")
         return is_uploaded
 
 

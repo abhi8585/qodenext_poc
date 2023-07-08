@@ -30,7 +30,7 @@ class UploadSalesOrderResource(Resource):
             is_saved = file_path
             self.logger.log_info(f"HELPER-Order File saved successfully : {order_file} in path : {saved_dir}")
         except Exception as e:
-            self.logger.log_error(f"HELPER-Error while saving file : {order_file} in path : {saved_dir}")
+            self.logger.log_error(f"HELPER-Error while saving file : {order_file} in path : {saved_dir} : {e}")
         return is_saved
 
 
@@ -42,7 +42,7 @@ class UploadSalesOrderResource(Resource):
             aws_bucket_name = self.config.get_value("s3", "aws_bucket_name")
             s3_client = S3Client(aws_access_key_id, aws_secret_access_key, aws_bucket_name)
         except Exception as e:
-            self.logger.log_error(f"HELPER-Error while creating S3 client")
+            self.logger.log_error(f"HELPER-Error while creating S3 client {e}")
         return s3_client
 
     
@@ -53,7 +53,7 @@ class UploadSalesOrderResource(Resource):
             is_uploaded = s3_client.upload_file(file_path,s3_file_name)
             self.logger.log_info(f"HELPER-Order File uploaded successfully to s3 : {file_path}")
         except Exception as e:
-            self.logger.log_error(f"HELPER-Error while uploading file : {file_path},  to S3")
+            self.logger.log_error(f"HELPER-Error while uploading file : {file_path},  to S3 {e}")
         return is_uploaded
 
     
@@ -74,7 +74,7 @@ class UploadSalesOrderResource(Resource):
             today = date.today()
             today_str = today.strftime('%Y-%m-%d')
         except Exception as e:
-            self.logger.log_error(f"HELPER-Error while getting today date")
+            self.logger.log_error(f"HELPER-Error while getting today date : {e}")
         return today_str
 
     def post(self):
