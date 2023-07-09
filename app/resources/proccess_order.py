@@ -11,6 +11,10 @@ logger = LoggerClient(verbosity=VerboseLevels.INFO.value)
 
 class ProcessOrderResource(Resource):
 
+    def __init__(self):
+        self.logger = LoggerClient(VerboseLevels.INFO.value)
+        self.config = ConfigClient(env=VerboseLevels.DEV.value)
+
     def read_order(self,file_path, sheet_name):
         order_data = None
         try:
@@ -29,11 +33,11 @@ class ProcessOrderResource(Resource):
                 insert_order_id = insert_status['last_row_id']
                 if insert_order_id:
                     order_id = insert_order_id
-                    logger.log_info(f"Order headers created successfully!")
+                    self.logger.log_info(f"Order headers created successfully!")
             else:
-                logger.log_info(f"Error while creating order headers for {order_date}")  
+                self.logger.log_info(f"Error while creating order headers for {order_date}")  
         except Exception as e:
-            logger.log_info(f"Error while creating order detail entry, Error : {e}")
+            self.logger.log_info(f"Error while creating order detail entry, Error : {e}")
         return order_id
 
     def process_order_data(self, order_row):
@@ -66,7 +70,7 @@ class ProcessOrderResource(Resource):
                         process_status['mag_30'] = int(value)
                 return process_status        
         except Exception as e:
-            logger.log_info(e)
+            self.logger.log_info(e)
         return process_status
 
 
@@ -74,8 +78,7 @@ class ProcessOrderResource(Resource):
         ret_obj = dict(status=None,order_id=None)
         try:
             sheet_name = 'Unix'
-            config = ConfigClient(env='dev')
-            mysql_uri = config.get_value("Database", "uri")
+            mysql_uri = self.config.get_value("Database", "uri")
             mysql_client = MySQLClient(mysql_uri)
             order_data = self.read_order(file_path=file_path,sheet_name=sheet_name)
             if order_data:
@@ -87,17 +90,17 @@ class ProcessOrderResource(Resource):
                         prc_order_data['order_id'] = order_id
                     order_detail_status = mysql_client.insert(table_name='order_details',column_values=prc_order_data)
                     if order_detail_status['status'] == "success":
-                        logger.log_info(f"Order detail row created successfully {prc_order_data}")
+                        self.logger.log_info(f"Order detail row created successfully {prc_order_data}")
                     else:
-                        logger.log_error(f"Error while creating order row {prc_order_data}")
+                        self.logger.log_error(f"Error while creating order row {prc_order_data}")
                 ret_obj['status'] = 200
                 ret_obj['order_id'] = order_id
             else:
-                logger(f"No order data to process")
+                self.logger.log_info(f"No order data to process")
                 ret_obj["status"] = 200
                 ret_obj["order_id"] = ""
         except Exception as e:
-            logger.log_error(f"Error in Process order get request {e}")
+            self.logger.log_error(f"Error in Process order get request {e}")
         return ret_obj
 
     def post(self):
