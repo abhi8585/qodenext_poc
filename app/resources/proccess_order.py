@@ -97,7 +97,7 @@ class ProcessOrderResource(Resource):
                 ret_obj["status"] = 200
                 ret_obj["order_id"] = ""
         except Exception as e:
-            logger.log_error(f"Error in Process order get request")
+            logger.log_error(f"Error in Process order get request {e}")
         return ret_obj
 
     def post(self):
