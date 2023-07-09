@@ -36,10 +36,10 @@ class UploadSalesOrderResource(Resource):
     def save_file(self, order_file):
         is_saved = None
         try:
-            # saved_dir = self.create_local_folder('uploaded_orders')
-            # saved_dir = 'uploaded_orders'
-            current_dir = os.getcwd() + '/resources/'
-            file_path = os.path.join(current_dir, order_file.filename)
+            saved_dir = self.create_local_folder('uploaded_orders')
+            saved_dir = 'uploaded_orders'
+            # current_dir = os.getcwd() + '/resources/'
+            file_path = os.path.join(saved_dir, order_file.filename)
             # print(f"file path : {file_path}")
             order_file.save(file_path)
             is_saved = file_path
