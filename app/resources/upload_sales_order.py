@@ -37,13 +37,15 @@ class UploadSalesOrderResource(Resource):
         is_saved = None
         try:
             # saved_dir = self.create_local_folder('uploaded_orders')
-            saved_dir = 'uploaded_orders'
-            file_path = os.path.join(saved_dir, order_file.filename)
+            # saved_dir = 'uploaded_orders'
+            current_dir = os.getcwd() + '/resources/'
+            file_path = os.path.join(current_dir, order_file.filename)
+            # print(f"file path : {file_path}")
             order_file.save(file_path)
             is_saved = file_path
-            self.logger.log_info(f"HELPER-Order File saved successfully : {order_file} in path : {saved_dir}")
+            self.logger.log_info(f"HELPER-Order File saved successfully : {order_file} in path : {file_path}")
         except Exception as e:
-            self.logger.log_error(f"HELPER-Error while saving file : {order_file} in path : {saved_dir} : {e}")
+            self.logger.log_error(f"HELPER-Error while saving file : {order_file} in path : {file_path} : {e}")
         return is_saved
 
 
