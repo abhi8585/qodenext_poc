@@ -4,10 +4,8 @@ from app.utils.config.config_client import ConfigClient
 from app.utils.xlsx.xlsx_client import XlsxClient
 from app.utils.logger.logger_client import LoggerClient
 from app.utils.logger.logger_verbose import VerboseLevels
-import json
-import uuid
-
-logger = LoggerClient(verbosity=VerboseLevels.INFO.value)
+from datetime import datetime
+import math
 
 class ProcessOrderResource(Resource):
 
@@ -22,13 +20,14 @@ class ProcessOrderResource(Resource):
             xlsx_client = XlsxClient(file_path=file_path,sheet_name=sheet_name)
             order_data = xlsx_client.read(cols_list=selected_cols)
         except Exception as e:
-            logger(e)
+            self.logger.log_error(f"MAIN-Error {e} while reading order file at {file_path}")
         return order_data
    
     def create_order_headers(self, mysql_client, order_date):
         order_id = None
         try:
-            insert_status = mysql_client.insert(table_name='order_header',column_values={'order_date':order_date})
+            insert_status = mysql_client.insert(table_name='order_header'
+                            ,column_values={'order_date':order_date, 'created_date' : datetime.now(),'update_date' : datetime.now()})
             if insert_status["status"] == "success":
                 insert_order_id = insert_status['last_row_id']
                 if insert_order_id:
@@ -41,8 +40,6 @@ class ProcessOrderResource(Resource):
         return order_id
 
     def process_order_data(self, order_row):
-        print(f"receiver order row  {order_row}")
-        import math
         process_status = None
         try:
             if order_row:
@@ -88,6 +85,8 @@ class ProcessOrderResource(Resource):
                     prc_order_data = self.process_order_data(order)
                     if prc_order_data:
                         prc_order_data['order_id'] = order_id
+                        prc_order_data['created_date'] = datetime.now()
+                        prc_order_data['update_date'] = datetime.now()
                     order_detail_status = mysql_client.insert(table_name='order_details',column_values=prc_order_data)
                     if order_detail_status['status'] == "success":
                         self.logger.log_info(f"Order detail row created successfully {prc_order_data}")
@@ -102,6 +101,3 @@ class ProcessOrderResource(Resource):
         except Exception as e:
             self.logger.log_error(f"Error in Process order get request {e}")
         return ret_obj
-
-    def post(self):
-        return {'message': 'POST request received'}
