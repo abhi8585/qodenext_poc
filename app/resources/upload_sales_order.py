@@ -98,8 +98,7 @@ class UploadSalesOrderResource(Resource):
                 return {'status' : 400, 'message' : 'No order file given'}
             is_file_saved = self.save_file(order_file)
             is_folder_created = self.create_s3_folder(self.get_today_date())
-            s3_file_name = is_folder_created + is_file_saved.split('/')[1]
-            self.logger.log_info(f"CHECKER-s3 file name is {s3_file_name}")
+            s3_file_name = is_folder_created + is_file_saved.split('/')[-1]
             if is_file_saved:
                 is_uploaded = self.upload_file(is_file_saved,s3_file_name)
                 if is_uploaded:
