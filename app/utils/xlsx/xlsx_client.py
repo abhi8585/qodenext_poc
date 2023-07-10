@@ -1,6 +1,8 @@
-
 import pandas as pd
+from app.utils.logger.logger_client import LoggerClient
+from app.utils.logger.logger_verbose import VerboseLevels
 
+logger = LoggerClient(VerboseLevels.INFO.value)
 
 class XlsxClient:
     def __init__(self, file_path=None, sheet_name=None):
@@ -21,6 +23,6 @@ class XlsxClient:
             df = self.convert_df(excel_data_df)
             return df
         except FileNotFoundError:
-            print(f"File not found: {self.file_path}")
+            logger.log_error(f"File not found: {self.file_path}")
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            logger.log_error(f"Error while reading excel file: {str(e)}")
