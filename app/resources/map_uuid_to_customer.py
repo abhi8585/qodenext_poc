@@ -62,8 +62,10 @@ class MapUuidToCustomerResource(Resource):
                             mapped_status['message'] = f"Given keg_code does not match with assigned product code"
                     else:
                         self.logger.log_info(f"No keg found for order_detail_id {order_detail_id}")
+                        mapped_status['message'] = f"No keg found for order_detail_id {order_detail_id}"
             else:
                 self.logger.log_info(f"No associated uuid found for order_detail_id ;{order_detail_id} & uuid : {order_detail_uuid_id}")
+                mapped_status['message'] = f"No associated uuid found in Database"
         except Exception as e:
             self.logger.log_error(f"Error while mapping order to customer, Error : {e}")
         return mapped_status
