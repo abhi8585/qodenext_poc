@@ -13,19 +13,18 @@ class GetCustomersList(Resource):
         self.mysql_client = MySQLClient(self.config.get_value("Database", "uri"))
 
     def get(self):
-        customers_data = dict(status=500,customer_data=None)
+        customers_data = dict(status=500,customer_data=[])
         try:
             query = f"select distinct outlets_name from order_details"
-            customers_data = self.mysql_client.execute_query(query)
-            if customers_data:
-                if customers_data["status"] == "success":
-                    customers_data["status"] = 200
-                    customers_data['customer_data'] = customers_data["results"]
-                    self.logger.log_info(f"Retreived customers list successfully!")
-                else:
-                    self.logger.log_error(f"select customers list failed")
+            db_customers_data = self.mysql_client.execute_query(query)
+            if db_customers_data and len(db_customers_data["results"]) > 0:
+                customers_data["status"] = 200
+                customers_data['customer_data'] = db_customers_data["results"]
+                self.logger.log_info(f"Retreived customers list successfully!")
             else:
                 self.logger.log_error(f"No customer data found")
+                customers_data['message'] = f"No customer data found"
         except Exception as e:
             self.logger.log_error(f"Internal Error while selecting customers list, Error : {e}")
+            customers_data['message'] = f"Internal Error while selecting customers"
         return customers_data
