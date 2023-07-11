@@ -24,6 +24,8 @@ from app.resources.map_uuid_to_pickup import MapUuidToPickupResource
 from app.resources.uuid_resource import UUIDValidationResource
 from app.resources.upload_sales_order import UploadSalesOrderResource
 
+from app.resources.map_uuid_to_warehouse import MapUuidToWareHouseResource
+
 
 
 # Create a blueprint for the route
@@ -53,6 +55,8 @@ get_customer_list_resource = GetCustomersList.as_view('get_customers_list')
 map_uuid_to_pickup_resouce = MapUuidToPickupResource.as_view('map_uuid_to_pickup_resouce')
 uuid_validation_resource = UUIDValidationResource.as_view('uuid_validation_resource')
 upload_sales_order_resource = UploadSalesOrderResource.as_view('upload_sales_order_resource')
+
+map_uuid_to_warehouse_resource = MapUuidToWareHouseResource.as_view('map_uuid_to_warehouse_resource') 
 
 
 
@@ -120,6 +124,9 @@ example_route.add_url_rule('/mpuuid', view_func=map_uuid_to_pickup_resouce)
 
 # check if the valid uuid is scanned
 example_route.add_url_rule('/vuuid', view_func=uuid_validation_resource)
+
+# Map uuid to warehouse
+example_route.add_url_rule('/mwuuid', view_func=map_uuid_to_warehouse_resource)
 
 
 
