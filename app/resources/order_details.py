@@ -58,6 +58,18 @@ class OrderDetailsResource(Resource):
         except Exception as e:
             self.logger.log_error(f"Error while getting order details, Error : {e}")
 
+    def get_keg_issue_count(self, order_id, product_key):
+        count = None
+        try:
+            query = f"select count(*) as issue_count from keg_mapping where order_id = {order_id} and product_name = '{product_key}'"
+            keg_count = self.mysql_client.execute_query(query=query)
+            if keg_count and len(keg_count['results']) > 0:
+                count  = keg_count['results'][0]['issue_count']
+            else:
+                self.logger.log_info(f"HELPER-No data for given order : {order_id} and product : {product_key}")
+        except Exception as e:
+            self.logger.log_error(f"HELPER-ERROR while getting keg issuse count for order : {order_id} and product : {product_key}")
+        return count
 
     def get_keg_count(self, order_id):
         keg_count = None
@@ -74,13 +86,20 @@ class OrderDetailsResource(Resource):
                 if key == "bud_30":
                     keg_name = "Budweiser Premium Beer"
                     keg_quantity = 30
+                    # keg_issue_count = self.get_keg_issue_count(order_id,key)
                 if key == "mag_30":
                     keg_name = "Bud Magnum Beer"
                     keg_quantity = 30
+                    # keg_issue_count = self.get_keg_issue_count(order_id,key)
                 if key == "hog_15":
                     keg_name = "Hoegaarden Witbier"
                     keg_quantity = 15
-                order_obj = dict(keg_name=keg_name,keg_quantity=keg_quantity,keg_count=value,keg_code=key)
+                    # keg_issue_count = self.get_keg_issue_count(order_id,key)
+                keg_issue_count = self.get_keg_issue_count(order_id, key)
+                keg_balance_count = value - keg_issue_count
+                order_obj = dict(keg_name=keg_name,keg_quantity=keg_quantity,
+                                keg_count=value,keg_code=key,keg_issue_count=keg_issue_count,
+                                keg_balance_count=keg_balance_count)
                 order_details.append(order_obj)                    
             return order_details
         except Exception as e:
@@ -92,7 +111,7 @@ class OrderDetailsResource(Resource):
         order_date = request.args.get('order_date')
         if order_date:
             try:
-                order_header_data = self.mysql_client.select(table_name='order_header',filter_condition=f"where order_date = '{order_date}' limit 1;")
+                order_header_data = self.mysql_client.select(table_name='order_header',filter_condition=f"where order_date = '{order_date}'  order by created_date desc limit 1;")
                 if order_header_data:
                     if len(order_header_data['results']) > 0:
                         order_id = order_header_data['results'][0]['order_id']
