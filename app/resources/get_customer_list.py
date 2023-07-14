@@ -20,6 +20,9 @@ class GetCustomersList(Resource):
             if db_customers_data and len(db_customers_data["results"]) > 0:
                 customers_data["status"] = 200
                 customers_data['customer_data'] = db_customers_data["results"]
+                c_d = customers_data["customer_data"]
+                for i in range(0, len(c_d)-1):
+                    c_d[i]['customer_id'] = i
                 self.logger.log_info(f"Retreived customers list successfully!")
             else:
                 self.logger.log_error(f"No customer data found")

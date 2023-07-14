@@ -16,6 +16,8 @@ from app.resources.access_management.login import LoginResource
 from app.resources.access_management.logout import LogoutResource
 from app.resources.access_management.map_role_to_permission import MapRoleToPermissionResource
 from app.resources.access_management.map_user_to_role import MapUserToRoleResource
+from app.resources.access_management.user_to_role import GetUserToRolesList
+from app.resources.access_management.user_to_role import GetUsersAndRolesList
 from app.resources.map_uuid_to_customer import MapUuidToCustomerResource
 
 from app.resources.get_customer_list import GetCustomersList
@@ -57,7 +59,9 @@ uuid_validation_resource = UUIDValidationResource.as_view('uuid_validation_resou
 upload_sales_order_resource = UploadSalesOrderResource.as_view('upload_sales_order_resource')
 
 map_uuid_to_warehouse_resource = MapUuidToWareHouseResource.as_view('map_uuid_to_warehouse_resource') 
+user_to_role_resource = GetUserToRolesList.as_view('user_to_role_resource') 
 
+user_and_role_resource = GetUsersAndRolesList.as_view('user_and_role_resource')
 
 
 example_route.add_url_rule('/mysql', view_func=mysql_resource.as_view('mysql'))
@@ -127,6 +131,9 @@ example_route.add_url_rule('/vuuid', view_func=uuid_validation_resource)
 
 # Map uuid to warehouse
 example_route.add_url_rule('/mwuuid', view_func=map_uuid_to_warehouse_resource)
+
+example_route.add_url_rule('/gutor', view_func=user_to_role_resource)
+example_route.add_url_rule('/gunr', view_func=user_and_role_resource)
 
 
 
