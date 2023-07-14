@@ -12,42 +12,6 @@ class GetUserToRolesList(Resource):
         self.logger = LoggerClient(VerboseLevels.INFO.value)
         self.mysql_client = MySQLClient(self.config.get_value("Database", "uri"))
 
-    
-    # def get_users_data(self):
-    #     users_data = None
-    #     try:
-    #         db_users_data = self.mysql_client.select(table_name='user')
-    #         if db_users_data and len(db_users_data['results']):
-    #             users_data = db_users_data['results']
-    #         else:
-    #             self.logger.log_error(f"HELPER-No data for USERS list ")
-    #     except Exception as e:
-    #         self.logger.log_error(f"HELPER-ERROR while getting user data : {e}")
-    #     return users_data
-
-    # def get_roles_data(self):
-    #     roles_data = None
-    #     try:
-    #         db_roles_data = self.mysql_client.select(table_name='role')
-    #         if db_roles_data and len(db_roles_data['results']):
-    #             roles_data = db_roles_data['results']
-    #         else:
-    #             self.logger.log_error(f"HELPER-No data for USERS list ")
-    #     except Exception as e:
-    #         self.logger.log_error(f"HELPER-ERROR while getting user data : {e}")
-    #     return roles_data
-
-    # def get_role_by_user_id(self, user_id):
-    #     role_data = None
-    #     try:
-    #         role_info = self.mysql_client.select(table_name='user_to_role',columns=['role_id'],filter_condition=f"where user_id = {user_id}")
-    #         if role_info and len(role_info['results']) > 0:
-    #             print(role_info)
-    #         else:
-    #             self.logger.log_error(f"HELPER-No role data for the given user : {user_id}")
-    #     except Exception as e:
-    #         self.logger.log_error(f"HELPER-Error : {e} while getting role info for user : {user_id}")
-
     def get_user_to_role(self):
         user_to_role_data = None
         try:
