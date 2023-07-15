@@ -24,7 +24,7 @@ class MapUuidToOrderResource(Resource):
         return is_duplicate
 
     def get(self):
-        mapped_status = dict(status=200,data=[])
+        mapped_status = dict(status=200,data={})
         try:
             order_id = request.args.get('order_id')
             if not order_id:
