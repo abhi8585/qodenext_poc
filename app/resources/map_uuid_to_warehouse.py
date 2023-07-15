@@ -29,6 +29,18 @@ class MapUuidToWareHouseResource(Resource):
             self.logger.log_error(f"MAIN-ERROR : {e} while udpating keg_customer_mapping table for {uuid_id}")
         return is_updated
 
+    def check_duplicate(self,order_detail_uuid ):
+        self.logger.log_info(f"checking for duplicates")
+        is_duplicate = False
+        try:
+            dup = self.mysql_client.select(table_name='keg_warehouse_mapping',columns=['id'],filter_condition=f"where uuid_id = '{order_detail_uuid}' and status = 'submitted'")
+            print(f"dup {dup}")
+            if dup and len(dup['results']) > 0:
+                is_duplicate = True
+        except Exception as e:
+            self.logger.log_error(f"HELPER-ERROR while checking duplicate for customer mapping order_detail_uuid {order_detail_uuid}")
+        return is_duplicate
+
 
     def get(self):
         mapped_status = dict(status=500,data=[])
@@ -42,6 +54,9 @@ class MapUuidToWareHouseResource(Resource):
             keg_uuid_id = self.mysql_client.select(table_name='uuid',filter_condition=f"where uuid = '{keg_uuid}'")
             if keg_uuid_id and len(keg_uuid_id['results']) > 0:
                 uuid_id = keg_uuid_id['results'][0]['id']
+                if self.check_duplicate(uuid_id):
+                    mapped_status['message'] = f"Keg already submitted to WareHouse"
+                    return mapped_status
                 keg_order_detail_id = self.mysql_client.select(table_name='keg_pickup_mapping',columns=['order_detail_id'],
                                                     filter_condition=f"where uuid_id = {uuid_id} and status = 'picked'")
                 if keg_order_detail_id and len(keg_order_detail_id["results"]) > 0:

@@ -14,6 +14,19 @@ class MapUuidToCustomerResource(Resource):
         self.logger = LoggerClient(VerboseLevels.INFO.value)
         self.mysql_client = MySQLClient(self.config.get_value("Database", "uri"))
 
+    def check_duplicate(self,order_detail_id, order_detail_uuid ):
+        self.logger.log_info(f"checking for duplicates")
+        is_duplicate = False
+        try:
+            dup = self.mysql_client.select(table_name='keg_customer_mapping',columns=['id'],filter_condition=f"where order_detail_id = {order_detail_id} and uuid_id = '{order_detail_uuid}' and status = 'delievered'")
+            print(f"dup {dup}")
+            if dup and len(dup['results']) > 0:
+                is_duplicate = True
+        except Exception as e:
+            self.logger.log_error(f"HELPER-ERROR while checking duplicate for customer mapping for order_detail_id {order_detail_id} & order_detail_uuid {order_detail_uuid}")
+        return is_duplicate
+
+
     def get(self):
         mapped_status = dict(status=500,data="")
         try:
@@ -37,12 +50,17 @@ class MapUuidToCustomerResource(Resource):
                 uuid_id = order_detail_uuid_id['results'][0]['id']
                 # checking if the keg is of same category 
                 # as it get mapped
+                # check for duplicate
+                if  self.check_duplicate(order_detail_id, uuid_id):
+                    mapped_status['message'] = f"keg is already delievered"
+                    return mapped_status
                 keg_code = self.mysql_client.select(table_name="keg_mapping",columns=["product_name"],filter_condition=f"where uuid_id = {uuid_id} and status = 'dispatched'")
                 if keg_code:
                     if len(keg_code["results"]) > 0:
                         keg_code_obj = keg_code["results"][0]["product_name"]
                         if keg_code_obj == order_product:
                             self.logger.log_info(f"Keg code Matched!")
+                            
                             row_obj = dict(order_detail_id=order_detail_id, uuid_id=uuid_id, user_id = user_id,
                                         status="delievered", created_date=datetime.now(),update_date=datetime.now())
                             insert_mapped_status = self.mysql_client.insert(table_name='keg_customer_mapping',column_values=row_obj)
@@ -62,7 +80,7 @@ class MapUuidToCustomerResource(Resource):
                             mapped_status['message'] = f"Given keg_code does not match with assigned product code"
                     else:
                         self.logger.log_info(f"No keg found for order_detail_id {order_detail_id}")
-                        mapped_status['message'] = f"No keg found for order_detail_id {order_detail_id}"
+                        mapped_status['message'] = f"The keg is not dispatched yet"
             else:
                 self.logger.log_info(f"No associated uuid found for order_detail_id ;{order_detail_id} & uuid : {order_detail_uuid_id}")
                 mapped_status['message'] = f"No associated uuid found in Database"

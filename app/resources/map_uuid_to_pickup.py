@@ -29,6 +29,18 @@ class MapUuidToPickupResource(Resource):
             self.logger.log_error(f"MAIN-ERROR : {e} while udpating keg_customer_mapping table for {uuid_id}")
         return is_updated
 
+    def check_duplicate(self,order_detail_uuid ):
+        self.logger.log_info(f"checking for duplicates")
+        is_duplicate = False
+        try:
+            dup = self.mysql_client.select(table_name='keg_pickup_mapping',columns=['id'],filter_condition=f"where uuid_id = '{order_detail_uuid}' and status = 'picked'")
+            print(f"dup {dup}")
+            if dup and len(dup['results']) > 0:
+                is_duplicate = True
+        except Exception as e:
+            self.logger.log_error(f"HELPER-ERROR while checking duplicate for customer mapping order_detail_uuid {order_detail_uuid}")
+        return is_duplicate
+
 
     def get(self):
         mapped_status = dict(status=500,data="")
@@ -46,9 +58,13 @@ class MapUuidToPickupResource(Resource):
                 return {'status' : 200, 'message' : 'No user_id given', 'data' : []}
             keg_uuid_id = self.mysql_client.select(table_name='uuid',filter_condition=f"where uuid = '{keg_uuid}'")
             if keg_uuid_id:
+                
                 uuid_id = keg_uuid_id['results'][0]['id']
                 keg_order_detail_id = self.mysql_client.select(table_name='keg_customer_mapping',columns=['order_detail_id'],
                                                     filter_condition=f"where uuid_id = {uuid_id} and status = 'delievered'")
+                if self.check_duplicate(uuid_id):
+                    mapped_status['message'] = f"Keg is already picked"
+                    return mapped_status
                 if keg_order_detail_id and len(keg_order_detail_id["results"]) > 0:
                     order_detail_id = keg_order_detail_id["results"][0]['order_detail_id']
                     assigned_customer_name = self.mysql_client.select(table_name="order_details", columns=["outlets_name"],
