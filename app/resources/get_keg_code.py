@@ -30,10 +30,17 @@ class GetKegCodeResource(Resource):
                         keg_code_data['status'] = 200
                     else:
                         self.logger.log_info(f"No master for the associated keg_id {keg_id}")
+                        keg_code_data['status'] = 200
+                        keg_code_data['message'] = "No master for the associated keg_id"
                 else:
                     self.logger.log_info(f"Given UUID : {uuid} is not associated with any keg")
+                    keg_code_data['status'] = 200
+                    keg_code_data['message'] = f"Given UUID : {uuid} is not associated with any keg"
             else:
-                self.logger.log_info(f"MAIN-No data for the given UUID {uuid}")  
+                self.logger.log_info(f"MAIN-No data for the given UUID {uuid}")
+                keg_code_data['status'] = 200
+                keg_code_data['message'] = f"Given UUID is not exist in database"  
+                
         except Exception as e:
             self.logger.log_error(f"MAIN-ERROR while getting uuid keg code {e}")
         return keg_code_data
