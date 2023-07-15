@@ -27,6 +27,8 @@ from app.resources.uuid_resource import UUIDValidationResource
 from app.resources.upload_sales_order import UploadSalesOrderResource
 
 from app.resources.map_uuid_to_warehouse import MapUuidToWareHouseResource
+from app.resources.map_uuid_to_product import MapUuidToProductResource
+from app.resources.get_keg_code import GetKegCodeResource
 
 
 
@@ -62,7 +64,8 @@ map_uuid_to_warehouse_resource = MapUuidToWareHouseResource.as_view('map_uuid_to
 user_to_role_resource = GetUserToRolesList.as_view('user_to_role_resource') 
 
 user_and_role_resource = GetUsersAndRolesList.as_view('user_and_role_resource')
-
+map_uuid_to_product_resource = MapUuidToProductResource.as_view('map_uuid_to_product_resource')
+get_keg_code_resource = GetKegCodeResource.as_view('get_keg_code_resource')
 
 example_route.add_url_rule('/mysql', view_func=mysql_resource.as_view('mysql'))
 # example_route.add_url_rule('/csv', view_func=csv_resource.as_view('csv'))
@@ -134,6 +137,10 @@ example_route.add_url_rule('/mwuuid', view_func=map_uuid_to_warehouse_resource)
 
 example_route.add_url_rule('/gutor', view_func=user_to_role_resource)
 example_route.add_url_rule('/gunr', view_func=user_and_role_resource)
+
+example_route.add_url_rule('/mutp', view_func=map_uuid_to_product_resource)
+
+example_route.add_url_rule('/guki', view_func=get_keg_code_resource)
 
 
 
