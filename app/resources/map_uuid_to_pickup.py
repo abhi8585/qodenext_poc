@@ -43,7 +43,7 @@ class MapUuidToPickupResource(Resource):
 
 
     def get(self):
-        mapped_status = dict(status=500,data="")
+        mapped_status = dict(status=500,data={})
         try:
             customer_name = request.args.get('customer_name')
             if not customer_name:
