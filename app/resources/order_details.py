@@ -27,6 +27,20 @@ class OrderDetailsResource(Resource):
         if key in dictionary:
             del dictionary[key]
         return dictionary
+
+
+    def get_customer_keg_mapping(self, order_detail_id, keg_code):
+        issue_count = 0
+        try:
+            query = f"select count(*) as issue_count from keg_customer_mapping where order_detail_id = {order_detail_id} and keg_product_code = '{keg_code}' and status = 'delievered'"
+            keg_count = self.mysql_client.execute_query(query=query)
+            if keg_count and len(keg_count['results']) > 0:
+                issue_count  = keg_count['results'][0]['issue_count']
+            else:
+                self.logger.log_info(f"HELPER-No data for given order_detail_id : {order_detail_id}")
+        except Exception as e:
+            self.logger.log_error(f"HELPER-Error while getting customer keg issue count for {order_detail_id} : {e}")
+        return issue_count
         
 
     def get_order_details(self, order_id):
@@ -43,16 +57,25 @@ class OrderDetailsResource(Resource):
                                 keg_obj = self.get_keg_name(key)
                                 keg_obj['keg_count'] = value
                                 keg_obj["keg_code"] = "bud_30"
+                                keg_issue_count = self.get_customer_keg_mapping(order_detail['order_detail_id'], keg_obj["keg_code"])
+                                keg_obj["keg_issue_count"] = keg_issue_count
+                                keg_obj["keg_balance_count"] = value - keg_issue_count
                                 order_detail["keg_data"].append(keg_obj)
                             if key == "mag_30":
                                 keg_obj = self.get_keg_name(key)
                                 keg_obj['keg_count'] = value
                                 keg_obj["keg_code"] = "mag_30"
+                                keg_issue_count = self.get_customer_keg_mapping(order_detail['order_detail_id'], keg_obj["keg_code"])
+                                keg_obj["keg_issue_count"] = keg_issue_count
+                                keg_obj["keg_balance_count"] = value - keg_issue_count                                
                                 order_detail["keg_data"].append(keg_obj)
                             if key == "hog_15":
                                 keg_obj = self.get_keg_name(key)
                                 keg_obj['keg_count'] = value
                                 keg_obj["keg_code"] = "hog_15"
+                                keg_issue_count = self.get_customer_keg_mapping(order_detail['order_detail_id'], keg_obj["keg_code"])
+                                keg_obj["keg_issue_count"] = keg_issue_count
+                                keg_obj["keg_balance_count"] = value - keg_issue_count                                
                                 order_detail["keg_data"].append(keg_obj)
                     return order_details_data
         except Exception as e:

@@ -60,5 +60,6 @@ class MapUuidToOrderResource(Resource):
                 self.logger.log_info(f"No uuid found for : {order_uuid}")
         except Exception as e:
             mapped_status['status'] = 500
+            mapped_status['data'] = ""
             self.logger.log_error(f"INTERNAL-Error while mapping UUID, Error : {e}")
         return mapped_status

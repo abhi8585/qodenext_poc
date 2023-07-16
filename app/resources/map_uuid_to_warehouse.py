@@ -43,7 +43,7 @@ class MapUuidToWareHouseResource(Resource):
 
 
     def get(self):
-        mapped_status = dict(status=500,data=[])
+        mapped_status = dict(status=500,data="")
         try:
             keg_uuid = request.args.get('keg_uuid')
             if not keg_uuid:

@@ -62,7 +62,7 @@ class MapUuidToCustomerResource(Resource):
                             self.logger.log_info(f"Keg code Matched!")
                             
                             row_obj = dict(order_detail_id=order_detail_id, uuid_id=uuid_id, user_id = user_id,
-                                        status="delievered", created_date=datetime.now(),update_date=datetime.now())
+                                        status="delievered", created_date=datetime.now(),update_date=datetime.now(),keg_product_code=order_product)
                             insert_mapped_status = self.mysql_client.insert(table_name='keg_customer_mapping',column_values=row_obj)
                             if insert_mapped_status:
                                 mapped_status = dict(status=200,data=insert_mapped_status)
