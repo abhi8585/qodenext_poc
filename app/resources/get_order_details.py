@@ -73,6 +73,7 @@ class GetOrderDetailsWebResource(Resource):
                             order['hog_15_count'] = order_keg['keg_count']
                         order['status'] = 'completed'
                 orders_data['orders_data']  = order_id_data
+                orders_data['orders_data'][-1]['status'] = "pending"
                 orders_data['status'] = 200
             else:
                 self.logger.log_info(f"MAIN-NO orders data in Database")
