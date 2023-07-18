@@ -21,9 +21,16 @@ class GetCustomersList(Resource):
                 customers_data["status"] = 200
                 customers_data['customer_data'] = db_customers_data["results"]
                 c_d = customers_data["customer_data"]
+                import random
                 for i in range(1, len(c_d)):
                     c_d[i]['customer_id'] = i+1
+                    c_d[i]['delivered_kegs'] = random.randint(20,50)
+                    c_d[i]['due_kegs'] = random.randint(4,12)
+                    c_d[i]['StatusBg'] = 'red'
                 customers_data["customer_data"][0]['customer_id'] = 1
+                customers_data["customer_data"][0]['delivered_kegs'] = random.randint(20,50)
+                customers_data["customer_data"][0]['due_kegs'] = random.randint(4,12)
+                customers_data["customer_data"][0]['StatusBg'] = 'red'
                 self.logger.log_info(f"Retreived customers list successfully!")
             else:
                 self.logger.log_error(f"No customer data found")
