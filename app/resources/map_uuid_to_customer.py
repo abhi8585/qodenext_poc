@@ -27,6 +27,22 @@ class MapUuidToCustomerResource(Resource):
         return is_duplicate
 
 
+    def check_no_quantity(self, order_detail_id, product_code):
+        self.logger.log_info(f"Checking is zero quantity required for {order_detail_id} and {product_code}")
+        is_required = None
+        try:
+            query = f"select {product_code} as keg_count from order_details where order_detail_id = {order_detail_id}"
+            is_zero = self.mysql_client.execute_query(query=query)
+            if is_zero and len(is_zero['results']) > 0:
+                print(is_zero['results'][0]['keg_count'])
+                is_zero_count = is_zero['results'][0]['keg_count']
+                is_required = is_zero_count
+            else:
+                self.logger.log_info(f"HELPER-INFO no data from checking zero quantity")
+        except Exception as e:
+            self.logger.log_error(f"HELPER-ERROR while checking zero quantity for keg : {e}")
+        return is_required
+
     def get(self):
         mapped_status = dict(status=500,data="")
         try:
@@ -53,6 +69,10 @@ class MapUuidToCustomerResource(Resource):
                 # check for duplicate
                 if  self.check_duplicate(order_detail_id, uuid_id):
                     mapped_status['message'] = f"keg is already delievered"
+                    return mapped_status
+                
+                if self.check_no_quantity(order_detail_id, order_product) == 0:
+                    mapped_status["message"] = f"No keg required"
                     return mapped_status
                 keg_code = self.mysql_client.select(table_name="keg_mapping",columns=["product_name"],filter_condition=f"where uuid_id = {uuid_id} and status = 'dispatched'")
                 if keg_code:
