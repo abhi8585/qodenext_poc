@@ -79,6 +79,8 @@ class GetOrderDetailsWebResource(Resource):
                 self.logger.log_info(f"MAIN-NO orders data in Database")
         except Exception as e:
             self.logger.log_error(f"MAIN-ERROR while getting uuid keg code {e}")
+        if len(orders_data) > 0:
+            orders_data['orders_data'] = orders_data['orders_data'][-5:]
         return orders_data
 
         
