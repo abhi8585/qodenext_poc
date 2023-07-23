@@ -21,9 +21,9 @@ class GetKegCodeResource(Resource):
             uuid_id = self.mysql_client.select(table_name='uuid',filter_condition=f"where uuid = '{uuid}'")
             if uuid_id and len(uuid_id['results']) > 0:
                 u_id =  uuid_id['results'][0]['id']
-                k_id = self.mysql_client.select(table_name='keg_to_uuid',filter_condition=f"where uuid_id = {u_id}")
+                k_id = self.mysql_client.select(table_name='keg_product_mapping',filter_condition=f"where uuid_id = {u_id}")
                 if k_id and len(k_id['results']) > 0:
-                    keg_id = k_id['results'][0]['keg_id']
+                    keg_id = k_id['results'][0]['product_code']
                     keg_code = self.mysql_client.select(table_name='keg_sku_master',columns=['keg_product_code'],filter_condition=f"where keg_id = {keg_id}")
                     if keg_code and len(keg_code['results']) > 0:
                         keg_code_data['keg_code'] = keg_code['results'][0]['keg_product_code']
