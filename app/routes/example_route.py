@@ -39,9 +39,9 @@ example_route = Blueprint('example_route', __name__)
 
 # adding url for creating new inventory kegs, by default brewery stage
 
-from app.resources.brewery.create_inventory_kegs import CreateInventoryKegsResource
-create_inventory_kegs_resource = CreateInventoryKegsResource.as_view('create_inventory_kegs_resource')
-example_route.add_url_rule('/cikr', view_func=create_inventory_kegs_resource)
+# from app.resources.brewery.create_inventory_kegs import CreateInventoryKegsResource
+# create_inventory_kegs_resource = CreateInventoryKegsResource.as_view('create_inventory_kegs_resource')
+# example_route.add_url_rule('/cikr', view_func=create_inventory_kegs_resource)
 
 # adding url for receiving keg in brewery from either customer or warehouse
 
