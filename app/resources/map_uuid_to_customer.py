@@ -1,11 +1,12 @@
 from flask_restful import Resource, request
 from app.utils.mysql.mysql_client import MySQLClient
 from app.utils.config.config_client import ConfigClient
-from app.utils.csv.csv_client import CsvClient
 from app.utils.logger.logger_client import LoggerClient
 from app.utils.logger.logger_verbose import VerboseLevels
-from app.utils.uuid.uuid_client import UUIDClient
+from app.utils.inventory.inventory_client import InventoryClient
+from app.utils.statics.statics import StaticValues
 from datetime import datetime
+
 
 class MapUuidToCustomerResource(Resource):
 
@@ -13,6 +14,7 @@ class MapUuidToCustomerResource(Resource):
         self.config = ConfigClient(env='dev')
         self.logger = LoggerClient(VerboseLevels.INFO.value)
         self.mysql_client = MySQLClient(self.config.get_value("Database", "uri"))
+        self.inventory_client = InventoryClient()
 
     def check_duplicate(self,order_detail_id, order_detail_uuid ):
         self.logger.log_info(f"checking for duplicates")
@@ -67,6 +69,10 @@ class MapUuidToCustomerResource(Resource):
                 # checking if the keg is of same category 
                 # as it get mapped
                 # check for duplicate
+                current_status = self.inventory_client.get_keg_status(uuid_id=uuid_id)
+                if current_status and current_status != StaticValues.WAREHOUSE_TO_CUSTOMER.value:
+                    mapped_status['message'] = f"Keg is not dispatched from the Warehouse"
+                    return mapped_status
                 if  self.check_duplicate(order_detail_id, uuid_id):
                     mapped_status['message'] = f"keg is already delievered"
                     return mapped_status
@@ -74,7 +80,7 @@ class MapUuidToCustomerResource(Resource):
                 if self.check_no_quantity(order_detail_id, order_product) == 0:
                     mapped_status["message"] = f"No keg required"
                     return mapped_status
-                keg_code = self.mysql_client.select(table_name="keg_mapping",columns=["product_name"],filter_condition=f"where uuid_id = {uuid_id} and status = 'dispatched'")
+                keg_code = self.mysql_client.select(table_name="keg_mapping",columns=["product_name"],filter_condition=f"where uuid_id = {uuid_id} and status = '{StaticValues.DISPATCHED.value}'")
                 if keg_code:
                     if len(keg_code["results"]) > 0:
                         keg_code_obj = keg_code["results"][0]["product_name"]
@@ -91,6 +97,11 @@ class MapUuidToCustomerResource(Resource):
                                 self.logger.log_info(f"Updating keg status in keg_mapping{keg_status_update}")
                                 if keg_status_update['status'] == "success":
                                     self.logger.log_info(f"Updated keg status in keg_mapping")
+                                    is_state_updated = self.inventory_client.update_keg_inventory_state(uuid_id=uuid_id,status=StaticValues.CUSTOMER.value)
+                                    if is_state_updated:
+                                        self.logger.log_info(f"Updated keg state to dispatch from warehouse to customer")
+                                    else:
+                                        self.logger.log_info(f"Failed while updating keg state in inventory")                                    
                                 else:
                                     self.logger.log_info(f"Failed while update keg {uuid_id} ")
                             else:

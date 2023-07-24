@@ -3,6 +3,8 @@ from app.utils.mysql.mysql_client import MySQLClient
 from app.utils.config.config_client import ConfigClient
 from app.utils.logger.logger_client import LoggerClient
 from app.utils.logger.logger_verbose import VerboseLevels
+from app.utils.statics.statics import StaticValues
+from app.utils.inventory.inventory_client import InventoryClient
 from datetime import datetime
 
 
@@ -13,6 +15,7 @@ class MapUuidToPickupResource(Resource):
         self.config = ConfigClient(env='dev')
         self.logger = LoggerClient(VerboseLevels.INFO.value)
         self.mysql_client = MySQLClient(self.config.get_value("Database", "uri"))
+        self.inventory_client = InventoryClient()
 
 
     def update_keg_customer_mapping(self, uuid_id):
@@ -44,6 +47,7 @@ class MapUuidToPickupResource(Resource):
 
     def get(self):
         mapped_status = dict(status=500,data={})
+        insert_mapped_status = None
         try:
             customer_name = request.args.get('customer_name')
             if not customer_name:
@@ -62,6 +66,10 @@ class MapUuidToPickupResource(Resource):
                 uuid_id = keg_uuid_id['results'][0]['id']
                 keg_order_detail_id = self.mysql_client.select(table_name='keg_customer_mapping',columns=['order_detail_id'],
                                                     filter_condition=f"where uuid_id = {uuid_id} and status = 'delievered'")
+                current_status = self.inventory_client.get_keg_status(uuid_id=uuid_id)
+                if current_status and current_status != StaticValues.CUSTOMER.value:
+                    mapped_status['message'] = f"Keg is not delivered at Customer"
+                    return mapped_status                
                 if self.check_duplicate(uuid_id):
                     mapped_status['message'] = f"Keg is already picked"
                     return mapped_status
@@ -82,11 +90,16 @@ class MapUuidToPickupResource(Resource):
                         update_keg_mapping = self.update_keg_customer_mapping(uuid_id)
                         if update_keg_mapping:
                             self.logger.log_info(f"Update keg_customer_mapping succed for {uuid_id}")
+                            is_updated = self.inventory_client.update_keg_inventory_state(uuid_id=uuid_id,status=StaticValues.PICKED.value)
+                            if is_updated:
+                                self.logger.log_info(f"Keg marked to picked status successfully")
+                            else:
+                                self.logger.log_info(f"Failed while marking Keg to picked status")
                         else:
                             self.logger.log_error(f"Error while updating keg_customer_mapping for {uuid_id}")
                     else:
                         self.logger.log_info(f"Error while mapping uuid with pickup")
-                        mapped_status['message'] = f"Error while mapping uuid to pickup"
+                        mapped_status['message'] = f"Keg is not associated with selected customer"
                 else:
                     self.logger.log_info(f"Given UUID is not mapped with any customer")
                     mapped_status['message'] = f"Given UUID is not mapped with any customer"
@@ -94,5 +107,5 @@ class MapUuidToPickupResource(Resource):
                 self.logger.log_info(f"No uuid found in Database")
                 mapped_status['message'] = f"UUID not exist in Database"
         except Exception as e:
-            self.logger.log_error(f"Error while generating UUI, Error : {e}")
+            self.logger.log_error(f"Error while Picking up the keg with UUID : {uuid_id}, Error : {e}")
         return mapped_status
