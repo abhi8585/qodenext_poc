@@ -119,7 +119,7 @@ class BreweryReceivingResource(Resource):
             self.logger.log_info(f"updating keg warehouse brewery dispatch mapping for {uuid_id}")
             condition = f"where uuid_id =  {uuid_id} and status = '{StaticValues.DISPATCHED.value}'"
             update_mapping = self.mysql_client.update(table='warehouse_to_brewery_dispatch',
-                            column_values={'status' : StaticValues.DELIVERED.value,'update_date':datetime.now()},
+                            column_values={'status' : StaticValues.DELIVERED.value,'updated_date':datetime.now()},
                             filter_condition=condition)
             if update_mapping:
                 is_updated = True
@@ -179,7 +179,6 @@ class BreweryReceivingResource(Resource):
         
     
     def get(self):
-        return dict(status=200,message="keg received successfully")
         receiving_data = dict(status=500,receiving_id="")
         try:
             uuid = request.args.get('uuid')
@@ -190,11 +189,14 @@ class BreweryReceivingResource(Resource):
                 return {'status' : 400, 'message' : 'No user_id given'}
             uuid_id = self.get_uuid_id(uuid=uuid)
             if uuid_id:
-                if self.check_already_received(uuid_id=uuid_id):
-                    receiving_data['message'] = f"Keg is already at Brewery"
-                    return receiving_data
+                # if self.check_already_received(uuid_id=uuid_id):
+                #     receiving_data['message'] = f"Keg is already at Brewery"
+                #     return receiving_data
                 # check status if receving from customer or warehouse
-                current_status = self.get_current_state(uuid_id)
+                current_status = self.inventory_client.get_keg_status(uuid_id=uuid_id)
+                if current_status == 'brewery':
+                    receiving_data['message'] = f"Keg is already at Brewery"
+                    return receiving_data                    
                 if current_status == 'picked':
                     self.logger.log_info(f"Receiving keg from Customer at Brewery with UUID : {uuid_id}")
                     is_received = self.receive_from_customer(uuid_id,user_id)
@@ -203,7 +205,7 @@ class BreweryReceivingResource(Resource):
                         receiving_data['status'] = 200
                         receiving_data['message'] = f"Empty Keg received in the Brewery from Customer"
                         receiving_data['receiving_id'] = is_received
-                elif current_status == 'warehouse':
+                elif current_status == 'wtb':
                     self.logger.log_info(f"Receiving Empty keg from the Warehouse in Brewery with UUID : {uuid_id}")
                     is_received = self.receive_from_warehouse(uuid_id,user_id)
                     if is_received:
@@ -214,25 +216,24 @@ class BreweryReceivingResource(Resource):
                 else:
                     self.logger.log_info(f"Keg is not either receiving from Warehouse or Customer")
                     receiving_data['message'] = f"Keg is not in Dispatched/Picked state."
-                return receiving_data
                 
-                if received_keg and received_keg['status'] == 'success':
-                    is_inventory_updated = self.inventory_client.update_keg_inventory_state(uuid_id=uuid_id,status='warehouse')
-                    if is_inventory_updated:
-                        upd_brewery_status = self.update_brewery_status(uuid_id=uuid_id)
-                        if upd_brewery_status:
-                            self.logger.log_info(f"Updated Brewery status to delivered for keg {uuid_id}")
-                            receiving_data['status'] = 200
-                            receiving_data['message'] = f"Keg received in the warehouse"
-                            receiving_data['receiving_id'] = received_keg['last_row_id']
-                        else:
-                            self.logger.log_error(f"Failed while updating brewery status for keg : {uuid_id}")
-                    else:
-                        self.logger.log_error(f"Error while udpating keg inventory status to received at warehouse for {uuid}")
-                        received_keg['message'] = f"Error while udpating keg inventory status to received at warehouse!"
-                else:
-                    self.logger.log_error(f"Error while inserting for receiving keg at warehouse {uuid}")
-                    received_keg['message'] = f"Error while inserting for receiving keg at warehouse"
+                # if received_keg and received_keg['status'] == 'success':
+                #     is_inventory_updated = self.inventory_client.update_keg_inventory_state(uuid_id=uuid_id,status='warehouse')
+                #     if is_inventory_updated:
+                #         upd_brewery_status = self.update_brewery_status(uuid_id=uuid_id)
+                #         if upd_brewery_status:
+                #             self.logger.log_info(f"Updated Brewery status to delivered for keg {uuid_id}")
+                #             receiving_data['status'] = 200
+                #             receiving_data['message'] = f"Keg received in the warehouse"
+                #             receiving_data['receiving_id'] = received_keg['last_row_id']
+                #         else:
+                #             self.logger.log_error(f"Failed while updating brewery status for keg : {uuid_id}")
+                #     else:
+                #         self.logger.log_error(f"Error while udpating keg inventory status to received at warehouse for {uuid}")
+                #         received_keg['message'] = f"Error while udpating keg inventory status to received at warehouse!"
+                # else:
+                #     self.logger.log_error(f"Error while inserting for receiving keg at warehouse {uuid}")
+                #     received_keg['message'] = f"Error while inserting for receiving keg at warehouse"
             else:
                 self.logger.log_info(f"No data for uuid : {uuid}")
         except Exception as e:
