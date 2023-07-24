@@ -50,7 +50,7 @@ class BreweryDispatchResource(Resource):
             if in_inventory and len(in_inventory['results']) == 0:
                 not_in_inventory = True
             else:
-                self.logger.log_info(f"No Keg in Brewery to Dispatch")
+                self.logger.log_info(f"Keg is available in Brewery to Dispatch")
         except Exception as e:
             self.logger.log_error(f"Error while checking if keg exists in inventory to dispatch:{e}")
         return not_in_inventory
