@@ -39,9 +39,9 @@ example_route = Blueprint('example_route', __name__)
 
 # adding url for creating new inventory kegs, by default brewery stage
 
-# from app.resources.brewery.create_inventory_kegs import CreateInventoryKegsResource
-# create_inventory_kegs_resource = CreateInventoryKegsResource.as_view('create_inventory_kegs_resource')
-# example_route.add_url_rule('/cikr', view_func=create_inventory_kegs_resource)
+from app.resources.brewery.create_inventory_kegs import CreateInventoryKegsResource
+create_inventory_kegs_resource = CreateInventoryKegsResource.as_view('create_inventory_kegs_resource')
+example_route.add_url_rule('/cikr', view_func=create_inventory_kegs_resource)
 
 # adding url for receiving keg in brewery from either customer or warehouse
 
@@ -67,9 +67,9 @@ from app.resources.warehouse.warehouse_receiving import WareHouseReceivingResour
 warehouse_receiving_resource = WareHouseReceivingResource.as_view('warehouse_receiving_resource')
 example_route.add_url_rule('/mwuuid', view_func=warehouse_receiving_resource)
 
-# from app.resources.warehouse.warehouse_to_brewery import WareHouseToBreweryDispatchResource
-# warehouse_to_brewery = WareHouseToBreweryDispatchResource.as_view('warehouse_to_brewery')
-# example_route.add_url_rule('/wtb', view_func=warehouse_to_brewery)
+from app.resources.warehouse.warehouse_to_brewery import WareHouseToBreweryDispatchResource
+warehouse_to_brewery = WareHouseToBreweryDispatchResource.as_view('warehouse_to_brewery')
+example_route.add_url_rule('/wtb', view_func=warehouse_to_brewery)
 
 # # ----WAREHOUSE URL'S END
 

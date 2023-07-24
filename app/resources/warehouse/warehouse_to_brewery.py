@@ -6,6 +6,7 @@ from app.utils.logger.logger_client import LoggerClient
 from app.utils.logger.logger_verbose import VerboseLevels
 from app.utils.uuid.uuid_client import UUIDClient
 from app.utils.inventory.inventory_client import InventoryClient
+from app.utils.statics.statics import StaticValues
 from datetime import datetime
 
 
@@ -52,11 +53,12 @@ class WareHouseToBreweryDispatchResource(Resource):
             self.logger.log_error(f"Error while checking if inventory status is dispatched to warehouse : {e}")
         return inventory_status
 
-    def update_brewery_status(self, uuid_id):
+    def update_warehouse_inventory(self, uuid_id):
         is_updated = None
         try:
-            col_values, filter_condition  = dict(status='delivered',updated_date=datetime.now()), f"where uuid_id = {uuid_id} and status = 'dispatched'"
-            upd_brewery = self.mysql_client.update(table='brewery_dispatch_mapping',column_values=col_values,filter_condition=filter_condition)
+            filter_condition =  f"where uuid_id = {uuid_id} and status = '{StaticValues.RECEIVED.value}' and received_from = '{StaticValues.CUSTOMER.value}'"
+            col_values = dict(status=StaticValues.DISPATCHED.value,updated_date=datetime.now())
+            upd_brewery = self.mysql_client.update(table='warehouse_inventory',column_values=col_values,filter_condition=filter_condition)
             if upd_brewery:
                 is_updated = True
         except Exception as e:
@@ -76,33 +78,8 @@ class WareHouseToBreweryDispatchResource(Resource):
             self.logger.log_error(f"Error while getting current state of the keg with UUID {uuid_id}")
         return current_state
 
-
-    def receive_from_brewery(self, uuid_id):
-        is_received = None
-        try:
-            column_values = dict(uuid_id=uuid_id,user_id=user_id,status='received',created_date=datetime.now(),received_from='brewery')
-            received_keg = self.mysql_client.insert(table_name='warehouse_inventory',column_values=column_values)
-            if received_keg and received_keg['status'] == 'success':
-                is_inventory_updated = self.inventory_client.update_keg_inventory_state(uuid_id=uuid_id,status='warehouse')
-                if is_inventory_updated:
-                    upd_brewery_status = self.update_brewery_status(uuid_id=uuid_id)
-                    if upd_brewery_status:
-                        self.logger.log_info(f"Updated Brewery status to delivered for keg {uuid_id}")
-                        is_received = True
-                    else:
-                        self.logger.log_error(f"Failed while udpating keg state in Brewery disaptch mapping for keg  with UUID {uuid_id}")
-                    self.logger.log_info(f"Updated Brewery status to delivered for keg {uuid_id}")
-                else:
-                    self.logger.log_error(f"Failed while udpating keg state in Brewery disaptch mapping for keg  with UUID {uuid_id}")
-            else:
-                self.logger.log_error(f"Failed while udpating keg inventory state to warehouse for keg  with UUID {uuid_id}")
-        except Exception as e:
-            self.logger.log_error(f"Error while receiving keg from Brewery , {e}")
-        return is_received
-    
     def get(self):
-        return dict(status=200,message="keg dispatched successfully")
-        receiving_data = dict(status=500,receiving_id="")
+        receiving_data = dict(status=500,dispatched_id="")
         try:
             uuid = request.args.get('uuid')
             if not uuid:
@@ -112,42 +89,36 @@ class WareHouseToBreweryDispatchResource(Resource):
                 return {'status' : 400, 'message' : 'No user_id given'}
             uuid_id = self.get_uuid_id(uuid=uuid)
             if uuid_id:
-                if self.check_already_received(uuid_id=uuid_id):
-                    receiving_data['message'] = f"Keg is already received at warehouse"
-                    return receiving_data
-                if not self.check_inventory_status(uuid_id):
-                    receiving_data['message'] = f"Keg is not dispatched from brewery yet!"
-                    return receiving_data
                 # check status if getting from brewery
                 current_status = self.get_current_state(uuid_id)
-                if current_status == 'btw':
-                    self.logger.log_info(f"Receiving keg from Brewery with UUID : {uuid_id}")
-                    # is_received = self.
-                elif current_status == 'picked':
-                    self.logger.log_info(f"Receiving Empty keg from the Customer in WareHouse")
-                else:
-                    self.logger.log_info(f"Keg is not either receiving from Brewery or Customer")
-                return
-                
-                if received_keg and received_keg['status'] == 'success':
-                    is_inventory_updated = self.inventory_client.update_keg_inventory_state(uuid_id=uuid_id,status='warehouse')
-                    if is_inventory_updated:
-                        upd_brewery_status = self.update_brewery_status(uuid_id=uuid_id)
-                        if upd_brewery_status:
-                            self.logger.log_info(f"Updated Brewery status to delivered for keg {uuid_id}")
-                            receiving_data['status'] = 200
-                            receiving_data['message'] = f"Keg received in the warehouse"
-                            receiving_data['receiving_id'] = received_keg['last_row_id']
+                if current_status != 'warehouse':
+                    self.logger.log_info(f"Keg is not in warehouse to dispatch : {uuid_id}")
+                    receiving_data['message'] = f"Keg is not in warehouse to dispatch"
+                    return receiving_data
+                    
+                elif current_status == 'warehouse':
+                    self.logger.log_info(f"Dispatching Empty keg To Brewery from WareHouse")
+                    col_values = dict(uuid_id=uuid_id,user_id=user_id,status=StaticValues.DISPATCHED.value,created_date=datetime.now())
+                    ins_res = self.mysql_client.insert(table_name='warehouse_to_brewery_dispatch',column_values=col_values)
+                    if ins_res:
+                        is_udpated = self.update_warehouse_inventory(uuid_id)
+                        if is_udpated:
+                            self.logger.log_info(f"Updated keg state from warehouse to brewery dispatch")
+                            is_state_updated = self.inventory_client.update_keg_inventory_state(uuid_id=uuid_id,status=StaticValues.WAREHOUSE_TO_BREWERY.value)
+                            if is_state_updated:
+                                self.logger.log_info("keg inventory state updated to warehouse to brewery dispatch")
+                                receiving_data['message'] = "keg dispatched to brewery"
+                                receiving_data['status'] = 200
+                                receiving_data['dispatched_id'] = ins_res['last_row_id']
+                            else:
+                                self.logger.log_info("failed while updating keg inventory state updated to warehouse to brewery dispatch")
                         else:
-                            self.logger.log_error(f"Failed while updating brewery status for keg : {uuid_id}")
+                            self.logger.log_info(f"Failed while updating keg state from warehouse to brewery dispatch")
                     else:
-                        self.logger.log_error(f"Error while udpating keg inventory status to received at warehouse for {uuid}")
-                        received_keg['message'] = f"Error while udpating keg inventory status to received at warehouse!"
+                        self.logger.log_error(f"Failed while inserting new row in warehouse to brewery dispatch resource")
+
                 else:
-                    self.logger.log_error(f"Error while inserting for receiving keg at warehouse {uuid}")
-                    received_keg['message'] = f"Error while inserting for receiving keg at warehouse"
-            else:
-                self.logger.log_info(f"No data for uuid : {uuid}")
+                    self.logger.log_info(f"Keg is not either in warehouse to dispatch")
         except Exception as e:
             self.logger.log_error(f"MAIN-Error while dispatching keg from the warehouse : {e}")
         return receiving_data
