@@ -45,18 +45,20 @@ example_route = Blueprint('example_route', __name__)
 
 # adding url for receiving keg in brewery from either customer or warehouse
 
-# from app.resources.brewery.brewery_receiving import BreweryReceivingResource
-# brewery_receiving_keg_resource = BreweryReceivingResource.as_view('brewery_receiving_keg_resource')
-# example_route.add_url_rule('/bwr', view_func=brewery_receiving_keg_resource)
-
-
-# # -----BREWERY URL'S END
+from app.resources.brewery.brewery_receiving import BreweryReceivingResource
+brewery_receiving_keg_resource = BreweryReceivingResource.as_view('brewery_receiving_keg_resource')
+example_route.add_url_rule('/bwr', view_func=brewery_receiving_keg_resource)
 
 # # adding url for dispatching keg to warehouse
 
-# from app.resources.brewery.brewery_dispatch_resource import BreweryDispatchResource
-# brewery_dispatch_resource = BreweryDispatchResource.as_view('brewery_dispatch_resource')
-# example_route.add_url_rule('/bdw', view_func=brewery_dispatch_resource)
+from app.resources.brewery.brewery_dispatch_resource import BreweryDispatchResource
+brewery_dispatch_resource = BreweryDispatchResource.as_view('brewery_dispatch_resource')
+example_route.add_url_rule('/bdw', view_func=brewery_dispatch_resource)
+
+
+# -----BREWERY URL'S END
+
+
 
 
 # # ----WAREHOUSE URL'S
