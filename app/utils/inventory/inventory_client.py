@@ -38,6 +38,20 @@ class InventoryClient:
             self.logger.log_error(f"Error while getting keg type")
         return None
 
+
+    def get_keg_status(self, uuid_id):
+        keg_status = None
+        try:
+            filter_condition = f"where uuid_id = {uuid_id}"
+            sel_res = self.mysql_client.select(table_name='keg_inventory',columns=['status'],filter_condition=filter_condition)
+            if sel_res and len(sel_res['results']) > 0:
+                keg_status = sel_res['results'][0]['status']
+            else:
+                self.logger.log_info(f"Failed while getting keg status from inventory")
+        except Exception as e:
+            self.logger.log_error(f"Error while getting keg status for {uuid_id}")
+        return keg_status
+
     def update_keg_product_inventory_state(self, uuid_id, current_product_code):
         is_updated = False
         try:
@@ -62,5 +76,5 @@ class InventoryClient:
             else:
                 self.logger.log_error(f"No keg mapping to product")
         except Exception as e:
-            self.logger.log_error(f"Error while updating keg inventory for UUID_ID :  {uuid_id}")
+            self.logger.log_error(f"Error while updating keg inventory for UUID_ID :  {uuid_id}, {e}")
         return is_updated
