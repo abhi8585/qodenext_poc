@@ -32,10 +32,74 @@ from app.resources.get_keg_code import GetKegCodeResource
 from app.resources.get_order_details import GetOrderDetailsWebResource
 from app.resources.get_order_header_details import GetOrderHeaderDetailsResource
 
-
-
 # Create a blueprint for the route
 example_route = Blueprint('example_route', __name__)
+
+# -----BREWERY URL'S START
+
+# adding url for creating new inventory kegs, by default brewery stage
+
+# from app.resources.brewery.create_inventory_kegs import CreateInventoryKegsResource
+# create_inventory_kegs_resource = CreateInventoryKegsResource.as_view('create_inventory_kegs_resource')
+# example_route.add_url_rule('/cikr', view_func=create_inventory_kegs_resource)
+
+# adding url for receiving keg in brewery from either customer or warehouse
+
+# from app.resources.brewery.brewery_receiving import BreweryReceivingResource
+# brewery_receiving_keg_resource = BreweryReceivingResource.as_view('brewery_receiving_keg_resource')
+# example_route.add_url_rule('/bwr', view_func=brewery_receiving_keg_resource)
+
+
+# # -----BREWERY URL'S END
+
+# # adding url for dispatching keg to warehouse
+
+# from app.resources.brewery.brewery_dispatch_resource import BreweryDispatchResource
+# brewery_dispatch_resource = BreweryDispatchResource.as_view('brewery_dispatch_resource')
+# example_route.add_url_rule('/bdw', view_func=brewery_dispatch_resource)
+
+
+# # ----WAREHOUSE URL'S
+
+# from app.resources.warehouse.warehouse_receiving import WareHouseReceivingResource
+# warehouse_receiving_resource = WareHouseReceivingResource.as_view('warehouse_receiving_resource')
+# example_route.add_url_rule('/wkr', view_func=warehouse_receiving_resource)
+
+# # ----WAREHOUSE URL'S END
+
+# # ----TESTING EMAIL URL'S
+
+# from app.resources.reports.send_email import SendEmail
+# email_resource = SendEmail.as_view('email_resource')
+# example_route.add_url_rule('/sm', view_func=email_resource)
+
+# # ----TESTING EMAIL URL'S END
+
+
+
+# ----MAPPING KEG TO SERIAL NUMBER URL'S
+
+from app.resources.master.map_serial_to_keg import MapSerialToKeg
+map_serial_to_keg_resource = MapSerialToKeg.as_view('map_serial_to_keg_resource')
+example_route.add_url_rule('/mstk', view_func=map_serial_to_keg_resource)
+
+# ----MAPPING KEG TO SERIAL NUMBER URL'S END
+
+
+
+# --URL for creating/getting SKU
+from app.resources.master.get_sku_master import SkuResource
+sku_resource = SkuResource.as_view('sku_resource')
+# Add route for creating a new user
+# example_route.add_url_rule('/user', view_func=user_resource, methods=['POST'])
+
+# Add route for retrieving user(s)
+example_route.add_url_rule('/sku', view_func=sku_resource, defaults={'sku_id': None}, methods=['GET'])
+example_route.add_url_rule('/sku/<int:sku_id>', view_func=sku_resource, methods=['GET'])
+
+
+
+
 
 # Add resource(s) to the blueprint
 
