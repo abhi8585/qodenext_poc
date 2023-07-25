@@ -24,6 +24,19 @@ class MapSerialToKeg(Resource):
         return is_duplicate
 
 
+    def check_duplicate_serial_number(self, serial_number):
+        is_duplicate = None
+        try:
+            filter_condition = f"where serial_number = '{serial_number}'"
+            sel_res = self.mysql_client.select(table_name='keg_serial_number_mapping',columns=['serial_number'],filter_condition=filter_condition)
+            if sel_res and len(sel_res['results']) > 0:
+                is_duplicate = True
+            else:
+                self.logger.log_info(f"Failed while check serial number duplicate")
+        except Exception as e:
+            self.logger.log_error(f"Error while checking if serial number is duplicate")
+        return is_duplicate
+
     def get(self):
         mapped_status = dict(status=500,mapped_id="")
         try:
@@ -40,12 +53,15 @@ class MapSerialToKeg(Resource):
                 return {'status' : 400, 'message' : 'No user_id given', 'data' : []}
 
             order_detail_uuid_id = self.mysql_client.select(table_name='uuid',filter_condition=f"where uuid = '{uuid}'")
-            if order_detail_uuid_id:
+            if order_detail_uuid_id and len(order_detail_uuid_id['results']) > 0:
                 uuid_id = order_detail_uuid_id['results'][0]['id']
                 # checking if the serial number is already mapped 
                 if  self.check_duplicate(uuid_id):
                     mapped_status['message'] = f"keg is already mapped"
-                    return mapped_status    
+                    return mapped_status 
+                if self.check_duplicate_serial_number(serial_number=serial_number):
+                    mapped_status['message'] = f"Serial Number already mapped"
+                    return mapped_status 
                 row_obj = dict(uuid_id=uuid_id, user_id=user_id,
                             serial_number=serial_number, created_date=datetime.now())
                 insert_mapped_status = self.mysql_client.insert(table_name='keg_serial_number_mapping',column_values=row_obj)
