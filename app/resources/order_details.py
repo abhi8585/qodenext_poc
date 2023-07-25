@@ -147,16 +147,16 @@ class OrderDetailsResource(Resource):
                             return {'status':200,'data': order_data}
                         else:
                             self.logger.log_info(f"Error while getting order details with order_id {order_id}")
-                            return {'status':200,'data': []}
+                            return {'status':500,'data': {}}
                     else:
                         self.logger.log_info(f"No data for given order date")
-                        return {'status':200,'data': []}
+                        return {'status':500,'data': {}}
                 else:
                     self.logger.log_info(f"Error while getting orded  details")
-                    return {'status':200,'data': []}
+                    return {'status':500,'data': {}}
             except Exception as e:
                 self.logger.log_info(f"Error while getting order data for date, {order_date}, Error :  {e}")
-                return {'status':500,'data': []}, 500
+                return {'status':500,'data': {}}, 500
         else:
             return {'status' : 400, 'message' : 'No order date provided'}, 400
 
