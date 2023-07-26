@@ -20,7 +20,7 @@ class MapUuidToCustomerResource(Resource):
         self.logger.log_info(f"checking for duplicates")
         is_duplicate = False
         try:
-            dup = self.mysql_client.select(table_name='keg_customer_mapping',columns=['id'],filter_condition=f"where order_detail_id = {order_detail_id} and uuid_id = '{order_detail_uuid}' and status = 'delievered'")
+            dup = self.mysql_client.select(table_name='keg_customer_mapping',columns=['id'],filter_condition=f"where uuid_id = '{order_detail_uuid}' and status = 'delievered'")
             print(f"dup {dup}")
             if dup and len(dup['results']) > 0:
                 is_duplicate = True
