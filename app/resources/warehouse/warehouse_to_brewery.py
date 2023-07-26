@@ -78,6 +78,17 @@ class WareHouseToBreweryDispatchResource(Resource):
             self.logger.log_error(f"Error while getting current state of the keg with UUID {uuid_id}")
         return current_state
 
+    def check_is_empty_keg(self, uuid_id):
+        is_empty = False
+        try:
+            filter_condition =  f"where uuid_id = {uuid_id} and status = '{StaticValues.RECEIVED.value}' and received_from = '{StaticValues.CUSTOMER.value}'"
+            sel_res = self.mysql_client.select(table_name='warehouse_inventory',filter_condition=filter_condition)
+            if sel_res and len(sel_res['results']) > 0:
+                is_empty = True
+        except Exception as e:
+            self.logger.log_error(f"Error while checking if actually empty keg is dispatchin, {e}")
+        return is_empty
+
     def get(self):
         receiving_data = dict(status=500,dispatched_id="")
         try:
@@ -98,6 +109,9 @@ class WareHouseToBreweryDispatchResource(Resource):
                     
                 elif current_status == 'warehouse':
                     self.logger.log_info(f"Dispatching Empty keg To Brewery from WareHouse")
+                    if not self.check_is_empty_keg(uuid_id=uuid_id):
+                        receiving_data['message'] = "Filled keg cannot dispatch back to Brewery"
+                        return receiving_data
                     col_values = dict(uuid_id=uuid_id,user_id=user_id,status=StaticValues.DISPATCHED.value,created_date=datetime.now())
                     ins_res = self.mysql_client.insert(table_name='warehouse_to_brewery_dispatch',column_values=col_values)
                     if ins_res:
