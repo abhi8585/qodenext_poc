@@ -69,12 +69,12 @@ class MapUuidToCustomerResource(Resource):
                 # checking if the keg is of same category 
                 # as it get mapped
                 # check for duplicate
+                if  self.check_duplicate(order_detail_id, uuid_id):
+                    mapped_status['message'] = f"keg is already delievered"
+                    return mapped_status
                 current_status = self.inventory_client.get_keg_status(uuid_id=uuid_id)
                 if current_status and current_status != StaticValues.WAREHOUSE_TO_CUSTOMER.value:
                     mapped_status['message'] = f"Keg is not dispatched from the Warehouse"
-                    return mapped_status
-                if  self.check_duplicate(order_detail_id, uuid_id):
-                    mapped_status['message'] = f"keg is already delievered"
                     return mapped_status
                 
                 if self.check_no_quantity(order_detail_id, order_product) == 0:
