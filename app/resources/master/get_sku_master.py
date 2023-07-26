@@ -2,20 +2,26 @@ from flask import Flask, request
 from flask_restful import Resource
 from app.utils.mysql.mysql_client import MySQLClient
 from app.utils.config.config_client import ConfigClient
+from app.utils.logger.logger_client import LoggerClient
+from app.utils.logger.logger_verbose import VerboseLevels
 import hashlib
 
-config = ConfigClient(env='dev')
-mysql_uri = config.get_value("Database", "uri")
-mysql_client = MySQLClient(mysql_uri)
+
 
 
 class SkuResource(Resource):
+
+    def __init__(self):
+        self.config = ConfigClient(env='dev')
+        self.mysql_client = MySQLClient(self.config.get_value("Database", "uri"))
+        self.logger = LoggerClient(verbosity=VerboseLevels.INFO.value)
+
 
     def get(self, sku_id):
         try:
             cols = ['keg_id','keg_name','keg_product_code','keg_quantity']
             if sku_id:
-                select_status = mysql_client.select('keg_sku_master',columns=cols, filter_condition=f"where keg_id = {sku_id}")
+                select_status = self.mysql_client.select('keg_sku_master',columns=cols, filter_condition=f"where keg_id = {sku_id}")
                 if select_status['status'] == 'success':
                     user = select_status['results']
                     return {'users' : user}, 200
@@ -23,7 +29,8 @@ class SkuResource(Resource):
                     return {'error': 'Failed to fetch sku'}, 500
             else:
                 # Fetch a complete list of users
-                select_status = mysql_client.select('keg_sku_master',columns=cols)
+                self.logger.log_info(f"Getting sku master list")
+                select_status = self.mysql_client.select('keg_sku_master',columns=cols)
                 if select_status['status'] == 'success':
                     print('going right')
                     users = select_status['results']
