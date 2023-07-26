@@ -67,12 +67,12 @@ class MapUuidToPickupResource(Resource):
                 keg_order_detail_id = self.mysql_client.select(table_name='keg_customer_mapping',columns=['order_detail_id'],
                                                     filter_condition=f"where uuid_id = {uuid_id} and status = 'delievered'")
                 current_status = self.inventory_client.get_keg_status(uuid_id=uuid_id)
-                if current_status and current_status != StaticValues.CUSTOMER.value:
-                    mapped_status['message'] = f"Keg is not delivered at Customer"
-                    return mapped_status                
                 if self.check_duplicate(uuid_id):
                     mapped_status['message'] = f"Keg is already picked"
                     return mapped_status
+                if current_status and current_status != StaticValues.CUSTOMER.value:
+                    mapped_status['message'] = f"Keg is not delivered at Customer"
+                    return mapped_status                
                 if keg_order_detail_id and len(keg_order_detail_id["results"]) > 0:
                     order_detail_id = keg_order_detail_id["results"][0]['order_detail_id']
                     assigned_customer_name = self.mysql_client.select(table_name="order_details", columns=["outlets_name"],
