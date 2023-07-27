@@ -6,6 +6,7 @@ from app.utils.logger.logger_client import LoggerClient
 from app.utils.logger.logger_verbose import VerboseLevels
 from app.utils.uuid.uuid_client import UUIDClient
 from app.utils.inventory.inventory_client import InventoryClient
+from app.utils.statics.statics import StaticValues
 from datetime import datetime
 
 
@@ -73,8 +74,13 @@ class BreweryDispatchResource(Resource):
             uuid_id = self.get_uuid_id(uuid=uuid)
             if uuid_id:
                 if self.check_already_dispatched(uuid_id=uuid_id):
+                    self.logger.log_info(f"Checking if keg is already dispatched")
                     dispatch_data['message'] = f"Keg is already dispatched to warehouse"
-                    return dispatch_data                
+                    return dispatch_data
+                current_status = self.inventory_client.get_keg_status(uuid_id=uuid_id)
+                if current_status != StaticValues.BREWERY.value:
+                    dispatch_data['message'] = f"Keg is not in brewery to dispatch"
+                    return dispatch_data              
                 update_keg_product_code = self.inventory_client.update_keg_product_inventory_state(uuid_id=uuid_id,current_product_code=keg_code)
                 if not update_keg_product_code:
                     dispatch_data['message'] = f"Error while updating keg product status"
