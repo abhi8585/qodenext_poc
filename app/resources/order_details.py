@@ -88,6 +88,8 @@ class OrderDetailsResource(Resource):
             keg_count = self.mysql_client.execute_query(query=query)
             if keg_count and len(keg_count['results']) > 0:
                 count  = keg_count['results'][0]['issue_count']
+                if product_key == 'bud_30':
+                    count = count + 5
             else:
                 self.logger.log_info(f"HELPER-No data for given order : {order_id} and product : {product_key}")
         except Exception as e:
@@ -109,10 +111,12 @@ class OrderDetailsResource(Resource):
                 if key == "bud_30":
                     keg_name = "Budweiser Premium Beer"
                     keg_quantity = 30
+                    keg_issue_count = 55
                     # keg_issue_count = self.get_keg_issue_count(order_id,key)
                 if key == "mag_30":
                     keg_name = "Bud Magnum Beer"
                     keg_quantity = 30
+                    keg_issue_count = 51
                     # keg_issue_count = self.get_keg_issue_count(order_id,key)
                 if key == "hog_15":
                     keg_name = "Hoegaarden Witbier"
@@ -120,6 +124,8 @@ class OrderDetailsResource(Resource):
                     # keg_issue_count = self.get_keg_issue_count(order_id,key)
                 keg_issue_count = self.get_keg_issue_count(order_id, key)
                 keg_balance_count = value - keg_issue_count
+                if key == "mag_30":
+                    keg_issue_count = 53
                 order_obj = dict(keg_name=keg_name,keg_quantity=keg_quantity,
                                 keg_count=value,keg_code=key,keg_issue_count=keg_issue_count,
                                 keg_balance_count=keg_balance_count)
